@@ -1,7 +1,6 @@
 from controllers.Controller import Controller
 from db.db import SessionLocal
 from flask import request, jsonify
-
 from models.UsersModel import User
 
 class CreateUserController(Controller):
@@ -28,6 +27,7 @@ class CreateUserController(Controller):
         }, 201)
 
     def GetUser(self):
+
         return jsonify({
             "msg": "User Found",
             "code": 200
