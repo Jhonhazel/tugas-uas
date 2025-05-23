@@ -1,5 +1,5 @@
 from flask import Flask
-from controllers.CreateUserController import CreateUserController
+from controllers.UserController import UserController
 from db.db import engine
 from models.UsersModel import Base
 
@@ -15,8 +15,8 @@ class EventWebsite:
         app = self.app
         @app.route("/api/user/create", methods=["POST"])
         def register_user():
-            controller = CreateUserController()
-            return controller.CreateUser()
+            user = UserController()
+            return user.Create()
 
     def run(self):
         self.app.run(debug=True, port=5555)
