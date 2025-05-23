@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head><title>Pendaftaran Saya</title></head>
+<body>
+  <h2>Pendaftaran Saya</h2>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, msg in messages %}
+        <p style="color: green;">{{ msg }}</p>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% if data %}
+    <ul>
+      {% for p in data %}
+        <li>{{ p.nama }} ({{ p.event }}) - {{ p.jumlah }} tiket</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Belum ada pendaftaran</p>
+  {% endif %}
+
+  <a href="{{ url_for('daftar_event') }}">Daftar Lagi</a> |
+  <a href="{{ url_for('home') }}">Home</a>
+</body>
+</html>

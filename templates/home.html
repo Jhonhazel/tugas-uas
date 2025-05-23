@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Beranda</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #f4f6f8, #dfe9f3);
+            color: #333;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        h2 {
+            color: #2c3e50;
+        }
+
+        .nav-links {
+            margin-top: 20px;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background-color: #2980b9;
+        }
+
+        .admin-link {
+            margin-top: 20px;
+            display: block;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Selamat datang, {{ username }}!</h2>
+        <div class="nav-links">
+            <a href="{{ url_for('daftar_event', event_id=1) }}">Daftar Tiket Event</a>
+            <a href="{{ url_for('lihat_pendaftaran') }}">Lihat Pendaftaran</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+
+        {% if current_user.role == 'admin' %}
+        <div class="admin-link">
+            <a href="{{ url_for('kelola_event') }}">Kelola Event</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
