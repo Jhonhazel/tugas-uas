@@ -1,0 +1,130 @@
+ body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Warna kustom yang diminta */
+        .bg-custom-dark-blue-gray {
+            background-color: rgb(67, 81, 101);
+        }
+        .text-custom-dark-blue-gray {
+            color: rgb(67, 81, 101);
+        }
+        /* Styling tambahan untuk scrollbar agar lebih serasi (opsional) */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgb(55, 65, 81); 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgb(100, 116, 139); 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgb(120, 136, 159);
+        }
+        /* Placeholder untuk ikon Lucide */
+        .lucide {
+            width: 1.25em; /* Ukuran default ikon */
+            height: 1.25em;
+            display: inline-block;
+            vertical-align: middle;
+            pointer-events: none; 
+        }
+        .sidebar-title-icon {
+            pointer-events: auto; 
+        }
+        /* Styling untuk item yang sedang di-drag */
+        .dragging {
+            opacity: 0.5;
+            background-color: rgb(30, 41, 59); 
+        }
+        .drag-over {
+            border-top: 2px dashed rgb(59, 130, 246); 
+        }
+        .sidebar-menu-item {
+            cursor: grab;
+        }
+        .sidebar-menu-item:active {
+            cursor: grabbing;
+        }
+        .profile-dropdown {
+            /* Transisi untuk opacity, transform (scale dan translate) */
+            transition-property: opacity, transform;
+            transition-timing-function: ease-in-out;
+            transition-duration: 200ms; /* Durasi transisi 0.2 detik */
+        }
+        .gemini-modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .gemini-modal-content {
+            max-height: 80vh;
+        }
+        .gemini-button {
+            font-size: 0.8rem; 
+            padding: 0.3rem 0.6rem; 
+            margin-top: 0.5rem; 
+        }
+        .resize-handle {
+            width: 10px; 
+            height: 100%;
+            position: absolute;
+            right: -5px; 
+            top: 0;
+            cursor: col-resize; 
+            z-index: 10; 
+        }
+        .sidebar {
+            transition: width 0.1s ease-out; 
+            overflow: hidden; /* Mencegah konten keluar saat transisi atau resize */
+        }
+
+        /* Styling untuk mode sidebar-collapsed (icon-only) */
+        .sidebar-collapsed .brand-text,
+        .sidebar-collapsed .brand-underline,
+        .sidebar-collapsed .sidebar-menu-item span,
+        .sidebar-collapsed .logout-text {
+            display: none;
+        }
+
+        .sidebar-collapsed .brand-icon-wrapper {
+            justify-content: center; /* Pusatkan ikon judul */
+        }
+        .sidebar-collapsed .brand-icon-wrapper .sidebar-title-icon {
+            margin-right: 0; /* Hapus margin kanan ikon judul */
+            height: 2rem; 
+            width: 2rem;  
+        }
+
+        .sidebar-collapsed .sidebar-menu-item a,
+        .sidebar-collapsed .logout-link-wrapper a {
+            justify-content: center; 
+            padding-left: 0.5rem; 
+            padding-right: 0.5rem;
+        }
+        .sidebar-collapsed .sidebar-menu-item a .lucide,
+        .sidebar-collapsed .logout-link-wrapper a .lucide {
+            margin-right: 0; 
+            width: 1.75em; 
+            height: 1.75em; 
+        }
+        
+        .sidebar-collapsed {
+            padding-left: 0.5rem; 
+            padding-right: 0.5rem;
+        }
+        .sidebar-collapsed .flex-col.items-center { 
+             margin-bottom: 0; 
+        }
+        /* Styling tambahan untuk item dropdown profil */
+        .profile-dropdown-item {
+            padding-top: 0.625rem; /* 10px */
+            padding-bottom: 0.625rem; /* 10px */
+            padding-left: 1rem; /* 16px */
+            padding-right: 1rem; /* 16px */
+        }
+        .profile-dropdown-item .lucide {
+            width: 1.125em; /* Sedikit lebih kecil agar proporsional dengan teks */
+            height: 1.125em;
+            margin-right: 0.75rem; /* Jarak antara ikon dan teks */
+        }

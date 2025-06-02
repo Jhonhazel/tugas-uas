@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@0.292.0/dist/umd/lucide.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboardstyle.css') }}">
+
+    <!-- <style>
+        /* Menggunakan font Inter */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Warna kustom yang diminta */
+        .bg-custom-dark-blue-gray {
+            background-color: rgb(67, 81, 101);
+        }
+        .text-custom-dark-blue-gray {
+            color: rgb(67, 81, 101);
+        }
+        /* Styling tambahan untuk scrollbar agar lebih serasi (opsional) */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgb(55, 65, 81); 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgb(100, 116, 139); 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgb(120, 136, 159);
+        }
+        /* Placeholder untuk ikon Lucide */
+        .lucide {
+            width: 1.25em; /* Ukuran default ikon */
+            height: 1.25em;
+            display: inline-block;
+            vertical-align: middle;
+            pointer-events: none; 
+        }
+        .sidebar-title-icon {
+            pointer-events: auto; 
+        }
+        /* Styling untuk item yang sedang di-drag */
+        .dragging {
+            opacity: 0.5;
+            background-color: rgb(30, 41, 59); 
+        }
+        .drag-over {
+            border-top: 2px dashed rgb(59, 130, 246); 
+        }
+        .sidebar-menu-item {
+            cursor: grab;
+        }
+        .sidebar-menu-item:active {
+            cursor: grabbing;
+        }
+        .profile-dropdown {
+            /* Transisi untuk opacity, transform (scale dan translate) */
+            transition-property: opacity, transform;
+            transition-timing-function: ease-in-out;
+            transition-duration: 200ms; /* Durasi transisi 0.2 detik */
+        }
+        .gemini-modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .gemini-modal-content {
+            max-height: 80vh;
+        }
+        .gemini-button {
+            font-size: 0.8rem; 
+            padding: 0.3rem 0.6rem; 
+            margin-top: 0.5rem; 
+        }
+        .resize-handle {
+            width: 10px; 
+            height: 100%;
+            position: absolute;
+            right: -5px; 
+            top: 0;
+            cursor: col-resize; 
+            z-index: 10; 
+        }
+        .sidebar {
+            transition: width 0.1s ease-out; 
+            overflow: hidden; /* Mencegah konten keluar saat transisi atau resize */
+        }
+
+        /* Styling untuk mode sidebar-collapsed (icon-only) */
+        .sidebar-collapsed .brand-text,
+        .sidebar-collapsed .brand-underline,
+        .sidebar-collapsed .sidebar-menu-item span,
+        .sidebar-collapsed .logout-text {
+            display: none;
+        }
+
+        .sidebar-collapsed .brand-icon-wrapper {
+            justify-content: center; /* Pusatkan ikon judul */
+        }
+        .sidebar-collapsed .brand-icon-wrapper .sidebar-title-icon {
+            margin-right: 0; /* Hapus margin kanan ikon judul */
+            height: 2rem; 
+            width: 2rem;  
+        }
+
+        .sidebar-collapsed .sidebar-menu-item a,
+        .sidebar-collapsed .logout-link-wrapper a {
+            justify-content: center; 
+            padding-left: 0.5rem; 
+            padding-right: 0.5rem;
+        }
+        .sidebar-collapsed .sidebar-menu-item a .lucide,
+        .sidebar-collapsed .logout-link-wrapper a .lucide {
+            margin-right: 0; 
+            width: 1.75em; 
+            height: 1.75em; 
+        }
+        
+        .sidebar-collapsed {
+            padding-left: 0.5rem; 
+            padding-right: 0.5rem;
+        }
+        .sidebar-collapsed .flex-col.items-center { 
+             margin-bottom: 0; 
+        }
+        /* Styling tambahan untuk item dropdown profil */
+        .profile-dropdown-item {
+            padding-top: 0.625rem; /* 10px */
+            padding-bottom: 0.625rem; /* 10px */
+            padding-left: 1rem; /* 16px */
+            padding-right: 1rem; /* 16px */
+        }
+        .profile-dropdown-item .lucide {
+            width: 1.125em; /* Sedikit lebih kecil agar proporsional dengan teks */
+            height: 1.125em;
+            margin-right: 0.75rem; /* Jarak antara ikon dan teks */
+        }
+
+    </style> -->
+</head>
+<body class="bg-custom-dark-blue-gray text-gray-100 flex flex-col min-h-screen">
+
+    <div class="flex flex-1"> 
+        <aside id="resizableSidebar" class="sidebar bg-slate-800 w-64 p-6 space-y-8 hidden md:flex flex-col shadow-lg relative"> 
+            <div class="flex flex-col items-center title-block-wrapper"> 
+                <div class="flex items-center brand-icon-wrapper">  
+                    <i data-lucide="layout-grid" class="lucide sidebar-title-icon text-white mr-2 h-7 w-7"></i>
+                    <h1 class="text-2xl font-bold text-white brand-text">DASHBOARD</h1> 
+                </div>
+                <div class="w-32 h-1 bg-blue-500 mt-2 rounded-full brand-underline"></div>  
+            </div>
+
+            <nav class="flex-grow">
+                <ul id="sidebarNav" class="space-y-3">
+                    <li draggable="true" class="sidebar-menu-item">
+                        <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-blue-500 hover:text-white rounded-lg transition-colors duration-200">
+                            <i data-lucide="layout-dashboard" class="lucide"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li draggable="true" class="sidebar-menu-item">
+                        <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-blue-500 hover:text-white rounded-lg transition-colors duration-200">
+                            <i data-lucide="calendar-days" class="lucide"></i>
+                            <span>Event</span>
+                        </a>
+                    </li>
+                    <li draggable="true" class="sidebar-menu-item">
+                        <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-blue-500 hover:text-white rounded-lg transition-colors duration-200">
+                            <i data-lucide="ticket" class="lucide"></i>
+                            <span>Ticket</span>
+                        </a>
+                    </li>
+                    <li draggable="true" class="sidebar-menu-item">
+                        <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-blue-500 hover:text-white rounded-lg transition-colors duration-200">
+                            <i data-lucide="users" class="lucide"></i>
+                            <span>Pengguna</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="mt-auto logout-link-wrapper"> 
+                <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors duration-200">
+                    <i data-lucide="log-out" class="lucide"></i>
+                    <span class="logout-text">Keluar</span> 
+                </a>
+            </div>
+            <div id="resizeHandle" class="resize-handle"></div> 
+        </aside>
+
+        <main class="flex-1 p-6 md:pt-6 md:px-10 md:pb-10 bg-custom-dark-blue-gray overflow-y-auto flex flex-col"> 
+            <header class="mb-8">
+                <div class="flex justify-end items-center"> 
+                    <button id="mobileMenuButton" class="md:hidden p-2 rounded-md text-gray-300 hover:bg-slate-700 mr-auto"> 
+                        <i data-lucide="menu" class="lucide h-6 w-6"></i>
+                    </button>
+                    <div class="hidden md:flex items-center space-x-4">
+                        <div class="relative">
+                            <button id="profileDropdownButton" type="button" class="flex items-center focus:outline-none">
+                                <img src="https://placehold.co/40x40/FFFFFF/3B82F6?text=U" alt="Avatar Pengguna" class="w-10 h-10 rounded-full border-2 border-blue-500 object-cover hover:opacity-80 transition-opacity">
+                            </button>
+                            <div id="profileDropdownMenu" class="profile-dropdown hidden absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-2 z-50 origin-top-right transform opacity-0 scale-95 -translate-y-2">
+                                <a href="#" class="profile-dropdown-item flex items-center text-sm text-gray-700 hover:bg-gray-100 hover:text-custom-dark-blue-gray rounded-md mx-1 my-0.5">
+                                    <i data-lucide="user-circle" class="lucide inline-block"></i>Profile
+                                </a>
+                                <a href="#" class="profile-dropdown-item flex items-center text-sm text-gray-700 hover:bg-gray-100 hover:text-custom-dark-blue-gray rounded-md mx-1 my-0.5">
+                                    <i data-lucide="history" class="lucide inline-block"></i>Activity Log
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:hidden flex items-center space-x-2 ml-auto"> 
+                        <div class="relative">
+                            <button id="mobileProfileDropdownButton" type="button" class="flex items-center focus:outline-none">
+                                <img src="https://placehold.co/32x32/FFFFFF/3B82F6?text=U" alt="Avatar Pengguna Mobile" class="w-8 h-8 rounded-full border-2 border-blue-500 object-cover hover:opacity-80 transition-opacity">
+                            </button>
+                            <div id="mobileProfileDropdownMenu" class="profile-dropdown hidden absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-2 z-50 origin-top-right transform opacity-0 scale-95 -translate-y-2">
+                                <a href="#" class="profile-dropdown-item flex items-center text-sm text-gray-700 hover:bg-gray-100 hover:text-custom-dark-blue-gray rounded-md mx-1 my-0.5">
+                                    <i data-lucide="user-circle" class="lucide inline-block"></i>Profile
+                                </a>
+                                <a href="#" class="profile-dropdown-item flex items-center text-sm text-gray-700 hover:bg-gray-100 hover:text-custom-dark-blue-gray rounded-md mx-1 my-0.5">
+                                    <i data-lucide="history" class="lucide inline-block"></i>Activity Log
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-grow flex items-center justify-center"> 
+                <p class="text-gray-400 text-lg">Area konten utama. Silakan pilih menu dari sidebar.</p>
+            </div>
+
+            <footer class="mt-auto text-center text-sm text-gray-400 py-4"> 
+                <p>&copy; <span id="currentYear"></span> Project UAS milik bersama.</p>
+            </footer>
+
+        </main>
+    </div>
+    
+    <div id="mobileSidebar" class="fixed inset-0 bg-slate-900 bg-opacity-75 z-40 hidden md:hidden">
+        <aside class="bg-slate-800 w-64 h-full p-6 space-y-6 flex flex-col shadow-lg absolute left-0 top-0">
+            <div class="flex justify-between items-center"> 
+                 <div class="flex items-center">
+                    <i data-lucide="layout-grid" class="lucide sidebar-title-icon text-white mr-2 h-6 w-6"></i>
+                    <h1 class="text-xl font-bold text-white">MENU</h1>
+                 </div>
+                <button id="closeMobileMenuButton" class="p-2 rounded-md text-gray-300 hover:bg-slate-700">
+                    <i data-lucide="x" class="lucide h-6 w-6"></i>
+                </button>
+            </div>
+            <nav class="flex-grow">
+                 <ul id="mobileSidebarNav" class="space-y-3"> <li draggable="true" class="sidebar-menu-item">
+                        <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-blue-500 hover:text-white rounded-lg transition-colors duration-200">
+                            <i data-lucide="layout-dashboard" class="lucide"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li draggable="true" class="sidebar-menu-item">
+                        <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-blue-500 hover:text-white rounded-lg transition-colors duration-200">
+                            <i data-lucide="calendar-days" class="lucide"></i>
+                            <span>Event</span>
+                        </a>
+                    </li>
+                    <li draggable="true" class="sidebar-menu-item">
+                        <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-blue-500 hover:text-white rounded-lg transition-colors duration-200">
+                            <i data-lucide="ticket" class="lucide"></i>
+                            <span>Tiket</span>
+                        </a>
+                    </li>
+                    <li draggable="true" class="sidebar-menu-item">
+                        <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-blue-500 hover:text-white rounded-lg transition-colors duration-200">
+                            <i data-lucide="users" class="lucide"></i>
+                            <span>Pengguna</span>
+                        </a>
+                    </li>
+                    </li>
+                </ul>
+            </nav>
+            <div class="mt-auto">
+                <a href="#" class="flex items-center space-x-3 px-4 py-3 text-gray-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors duration-200">
+                    <i data-lucide="log-out" class="lucide"></i>
+                    <span>Keluar</span>
+                </a>
+            </div>
+        </aside>
+    </div>
+
+
+    <!-- <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            } else {
+                console.error('Lucide library tidak termuat dengan benar.');
+            }
+
+            const currentYearEl = document.getElementById('currentYear');
+            if (currentYearEl) {
+                currentYearEl.textContent = new Date().getFullYear();
+            }
+            
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const mobileSidebarEl = document.getElementById('mobileSidebar'); 
+            const closeMobileMenuButton = document.getElementById('closeMobileMenuButton');
+
+            if (mobileMenuButton && mobileSidebarEl && closeMobileMenuButton) {
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileSidebarEl.classList.remove('hidden');
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons(); 
+                    }
+                });
+
+                closeMobileMenuButton.addEventListener('click', () => {
+                    mobileSidebarEl.classList.add('hidden');
+                });
+                
+                mobileSidebarEl.addEventListener('click', (event) => {
+                    if (event.target === mobileSidebarEl) {
+                        mobileSidebarEl.classList.add('hidden');
+                    }
+                });
+            } else {
+                console.error("Elemen menu mobile tidak ditemukan atau tidak lengkap.");
+            }
+
+            const profileDropdownButton = document.getElementById('profileDropdownButton');
+            const profileDropdownMenu = document.getElementById('profileDropdownMenu');
+            const mobileProfileDropdownButton = document.getElementById('mobileProfileDropdownButton'); 
+            const mobileProfileDropdownMenu = document.getElementById('mobileProfileDropdownMenu'); 
+
+            function setupDropdown(button, menu) {
+                if (button && menu) {
+                    button.addEventListener('click', function(event) {
+                        event.stopPropagation(); 
+                        const isHidden = menu.classList.contains('hidden');
+                        
+                        if (isHidden) {
+                            menu.classList.remove('hidden');
+                            requestAnimationFrame(() => {
+                                menu.classList.remove('opacity-0', 'scale-95', '-translate-y-2');
+                                menu.classList.add('opacity-100', 'scale-100', 'translate-y-0');
+                            });
+                        } else {
+                            menu.classList.remove('opacity-100', 'scale-100', 'translate-y-0');
+                            menu.classList.add('opacity-0', 'scale-95', '-translate-y-2');
+                            setTimeout(() => {
+                                menu.classList.add('hidden');
+                            }, 200); 
+                        }
+                        if (typeof lucide !== 'undefined') {
+                            lucide.createIcons();
+                        }
+                    });
+                }
+            }
+
+            setupDropdown(profileDropdownButton, profileDropdownMenu);
+            setupDropdown(mobileProfileDropdownButton, mobileProfileDropdownMenu);
+
+
+            window.addEventListener('click', function(event) {
+                [profileDropdownMenu, mobileProfileDropdownMenu].forEach(menu => {
+                    if (menu && !menu.classList.contains('hidden')) {
+                        const button = menu.id === 'profileDropdownMenu' ? profileDropdownButton : mobileProfileDropdownButton;
+                        if (button && !button.contains(event.target) && !menu.contains(event.target)) {
+                            menu.classList.remove('opacity-100', 'scale-100', 'translate-y-0');
+                            menu.classList.add('opacity-0', 'scale-95', '-translate-y-2');
+                            setTimeout(() => {
+                                menu.classList.add('hidden');
+                            }, 200);
+                        }
+                    }
+                });
+            });
+
+
+            function initializeDragAndDrop(containerId) {
+                const sidebarNav = document.getElementById(containerId);
+                if (!sidebarNav) {
+                    return;
+                }
+                let draggedItem = null;
+                sidebarNav.addEventListener('dragstart', (e) => {
+                    if (e.target.tagName === 'LI' && e.target.classList.contains('sidebar-menu-item')) {
+                        draggedItem = e.target;
+                        setTimeout(() => {
+                            if(draggedItem) draggedItem.classList.add('dragging');
+                        }, 0);
+                        e.dataTransfer.setData('text/plain', e.target.innerText); 
+                        e.dataTransfer.effectAllowed = 'move';
+                    } else {
+                        e.preventDefault(); 
+                    }
+                });
+                sidebarNav.addEventListener('dragend', (e) => {
+                    if (draggedItem && e.target.classList.contains('sidebar-menu-item')) {
+                         setTimeout(() => {
+                            if(draggedItem) draggedItem.classList.remove('dragging');
+                            draggedItem = null; 
+                        }, 0);
+                    }
+                    const items = sidebarNav.querySelectorAll('.sidebar-menu-item');
+                    items.forEach(item => item.classList.remove('drag-over'));
+                });
+                sidebarNav.addEventListener('dragover', (e) => {
+                    e.preventDefault(); 
+                    const targetItem = e.target.closest('.sidebar-menu-item');
+                    if (targetItem && draggedItem && targetItem !== draggedItem) {
+                        const items = sidebarNav.querySelectorAll('.sidebar-menu-item');
+                        items.forEach(item => {
+                            if (item !== targetItem) {
+                                item.classList.remove('drag-over');
+                            }
+                        });
+                        targetItem.classList.add('drag-over'); 
+                        const rect = targetItem.getBoundingClientRect();
+                        const nextSibling = getNextSibling(e.clientY, targetItem, rect);
+                        if (nextSibling) {
+                            sidebarNav.insertBefore(draggedItem, nextSibling);
+                        } else {
+                            sidebarNav.appendChild(draggedItem);
+                        }
+                    }
+                });
+                sidebarNav.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const targetItem = e.target.closest('.sidebar-menu-item');
+                    if (targetItem) {
+                        targetItem.classList.remove('drag-over'); 
+                    }
+                });
+                function getNextSibling(mouseY, element, rect) {
+                    const halfway = rect.top + rect.height / 2;
+                    if (mouseY < halfway) {
+                        return element; 
+                    } else {
+                        return element.nextElementSibling; 
+                    }
+                }
+            }
+            initializeDragAndDrop('sidebarNav'); 
+            initializeDragAndDrop('mobileSidebarNav');
+
+            const geminiModal = document.getElementById('geminiResultModal');
+            const geminiModalTitle = document.getElementById('geminiModalTitle');
+            const geminiModalBody = document.getElementById('geminiModalBody');
+            const closeGeminiModalButton = document.getElementById('closeGeminiModalButton');
+
+            function showGeminiModal(title) {
+                if (!geminiModal || !geminiModalTitle || !geminiModalBody) return; 
+                geminiModalTitle.textContent = title;
+                geminiModalBody.innerHTML = '<p class="text-center py-4">Memuat hasil dari Gemini...</p>';
+                geminiModal.classList.remove('hidden');
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons(); 
+                }
+            }
+
+            function closeGeminiModal() {
+                 if (!geminiModal) return; 
+                geminiModal.classList.add('hidden');
+            }
+
+            if (closeGeminiModalButton) {
+                closeGeminiModalButton.addEventListener('click', closeGeminiModal);
+            }
+            if (geminiModal) {
+                geminiModal.addEventListener('click', function(event) {
+                    if (event.target === geminiModal) {
+                        closeGeminiModal();
+                    }
+                });
+            }
+
+
+            async function callGeminiAPI(prompt) {
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
+                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                const payload = { contents: chatHistory };
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('Error from Gemini API:', errorData);
+                        return `Error: ${errorData.error?.message || response.statusText}`;
+                    }
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        return result.candidates[0].content.parts[0].text;
+                    } else {
+                        console.error('Unexpected response structure from Gemini API:', result);
+                        return "Tidak ada konten yang diterima dari Gemini.";
+                    }
+                } catch (error) {
+                    console.error('Fetch error calling Gemini API:', error);
+                    return "Terjadi kesalahan saat menghubungi layanan Gemini.";
+                }
+            }
+
+            // --- Logika untuk Resize Sidebar ---
+            const sidebar = document.getElementById('resizableSidebar');
+            const resizeHandle = document.getElementById('resizeHandle');
+            
+            if (sidebar && resizeHandle) {
+                let isResizing = false;
+                let startX;
+                let startWidth;
+                const iconOnlyWidth = 80; 
+                const maxWidth = 320;    
+
+                function checkAndApplyCollapsedState(currentWidth) {
+                    if (currentWidth <= iconOnlyWidth) {
+                        if (!sidebar.classList.contains('sidebar-collapsed')) {
+                            sidebar.classList.add('sidebar-collapsed');
+                            if (typeof lucide !== 'undefined') lucide.createIcons();
+                        }
+                    } else {
+                        if (sidebar.classList.contains('sidebar-collapsed')) {
+                            sidebar.classList.remove('sidebar-collapsed');
+                            if (typeof lucide !== 'undefined') lucide.createIcons();
+                        }
+                    }
+                }
+                
+                const initialWidth = parseInt(document.defaultView.getComputedStyle(sidebar).width, 10);
+                checkAndApplyCollapsedState(initialWidth);
+
+
+                resizeHandle.addEventListener('mousedown', function(e) {
+                    e.preventDefault(); 
+                    isResizing = true;
+                    startX = e.clientX;
+                    startWidth = parseInt(document.defaultView.getComputedStyle(sidebar).width, 10);
+                    document.body.style.cursor = 'col-resize'; 
+                    document.body.style.userSelect = 'none'; 
+                    sidebar.style.transition = 'none'; 
+                });
+
+                document.addEventListener('mousemove', function(e) {
+                    if (!isResizing) return;
+                    
+                    let newWidth = startWidth + (e.clientX - startX);
+                    
+                    if (newWidth < iconOnlyWidth) {
+                        newWidth = iconOnlyWidth;
+                    } else if (newWidth > maxWidth) {
+                        newWidth = maxWidth;
+                    }
+                    sidebar.style.width = newWidth + 'px';
+                    checkAndApplyCollapsedState(newWidth); 
+                });
+
+                document.addEventListener('mouseup', function(e) {
+                    if (isResizing) {
+                        isResizing = false;
+                        document.body.style.cursor = 'default'; 
+                        document.body.style.userSelect = 'auto'; 
+                        sidebar.style.transition = 'width 0.1s ease-out'; 
+                        
+                        const finalWidth = parseInt(document.defaultView.getComputedStyle(sidebar).width, 10);
+                        checkAndApplyCollapsedState(finalWidth);
+                    }
+                });
+            }
+
+
+        });
+    </script> -->
+</body>
+<script src="static/script.js" defer></script>
+</html>
