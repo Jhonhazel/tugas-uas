@@ -108,7 +108,7 @@ class BookingController(Controller):
             return jsonify({"msg": "Booking or payment not found"}), 404
 
         # check is time is more than 30 min, than canceled booking automaticly
-        if (has_time_passed(booking.created_at, 1) and payment.status != "SUCCESS"):
+        if (has_time_passed(booking.created_at, 60) and payment.status != "SUCCESS"):
             booking.payment_status = "CANCELLED"
             payment.status = "CANCELLED"
             payment.payment_date = datetime.now()
