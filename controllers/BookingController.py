@@ -103,15 +103,20 @@ class BookingController(Controller):
 
         booking = self._db.query(Booking).filter(Booking.id == booking_id).first()
         payment = self._db.query(PaymentInfo).filter(PaymentInfo.id == payment_id).first()
+        event = self._db.query(Event).filter(Event.id == booking.event_id).first()
 
         if not booking or not payment:
             return jsonify({"msg": "Booking or payment not found"}), 404
 
         # check is time is more than 30 min, than canceled booking automaticly
-        if (has_time_passed(booking.created_at, 60) and payment.status != "SUCCESS"):
+        if (has_time_passed(booking.created_at, 1) and payment.status != "SUCCESS"):
             booking.payment_status = "CANCELLED"
             payment.status = "CANCELLED"
             payment.payment_date = datetime.now()
+            event.current_capacity -= 1
+            event.is_fullybooked = event.current_capacity >= event.capacity
+            event.is_available = not event.is_fullybooked
+            event.tikets_count -= 1
 
             self._db.commit()
             return jsonify({"msg": "Payment declined due to timeout"}), 200

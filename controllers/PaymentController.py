@@ -2,6 +2,7 @@ from datetime import datetime
 from lib.model_to_dicts import model_to_dict
 from lib.string_func import generate_random_string
 from models.Bookings import Booking
+from models.Events import Event
 from models.PaymentInfo import PaymentInfo
 from controllers.Controllers import Controller
 from flask import jsonify
@@ -29,6 +30,7 @@ class PaymentController(Controller):
 
         booking = self._db.query(Booking).filter(Booking.id == booking_id).first()
         ticket = self._db.query(Ticket).filter(Ticket.booking_id == booking_id).first()
+        event = self._db.query(Event).filter(Event.id == booking.event_id).first()
 
         payment_data = {
             "id": generate_random_string(),
@@ -44,9 +46,16 @@ class PaymentController(Controller):
         try:
             payment = PaymentInfo(**payment_data)
             booking.payment_status = "SUCCESS"
+            event.current_capacity += 1
+            event.is_fullybooked = event.current_capacity >= event.capacity
+            event.is_available = not event.is_fullybooked
+            event.tikets_count += 1
+
             self._db.add(payment)
             self._db.commit()
             self._db.refresh(payment)
+            self._db.refresh(booking)
+            self._db.refresh(event)
             self._db.close()
 
             return jsonify({
