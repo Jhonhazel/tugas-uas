@@ -9,4 +9,7 @@ class LoginHistory(Base):
     logout_date = Column(DateTime, nullable=True)
     device_id = Column(String(12))
 
-    user = relationship("User", back_populates="login_history")
+    user = relationship("User", back_populates="login_history", passive_deletes=True)
+
+    def __repr__(self):
+        return f"<LoginHistory(id={self.id}, user_id='{self.user_id}'"

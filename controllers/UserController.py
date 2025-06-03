@@ -2,8 +2,8 @@ from controllers.Controllers import Controller
 from flask import jsonify
 
 from lib.comparePass import hash_password
-from lib.randomString import generate_random_string
-from models.UsersModel import User
+from lib.string_func import generate_random_string
+from models.Users import User
 
 class UserController(Controller):
     def __init__(self):

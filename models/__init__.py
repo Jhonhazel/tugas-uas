@@ -1,2 +1,1 @@
-from models.UsersModel import User
-from models.LoginHistory import LoginHistory
+from models import Events, Tickets, Vendors, Users, Customers, PaymentInfo, Bookings, LoginHistory

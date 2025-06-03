@@ -4,9 +4,10 @@ from flask import request, jsonify, redirect, url_for
 from flask_login import login_user, current_user, logout_user
 from controllers.Controllers import Controller
 from lib.comparePass import comparePass
-from lib.randomString import generate_random_string
-from models.UsersModel import User
+from lib.string_func import generate_random_string
+from models.Users import User
 from models.LoginHistory import LoginHistory
+
 
 class LoginController(Controller):
     def __init__(self):
@@ -39,10 +40,14 @@ class LoginController(Controller):
     def Logout(self):
 
         try:
-            self._db.query(LoginHistory).update({"logout_date": datetime.now()})
+
+            self._db.query(LoginHistory).filter_by(user_id=current_user.id, logout_date=None).update(
+                {"logout_date": datetime.now()})
+            self._db.commit()
+
+            logout_user()
+            return redirect(url_for('login'))
         except Exception as e:
             print(e)
+            self._db.rollback()
             return jsonify({"message": "Logout failed"}), 401
-        finally:
-            logout_user()
-        return redirect(url_for('login'))
