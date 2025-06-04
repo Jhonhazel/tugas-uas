@@ -1,14 +1,14 @@
-from flask_login import LoginManager, login_required, current_user
+from flask_login import LoginManager, login_required
 
+from controllers.AdminController import AdminController
 from controllers.BookingController import BookingController
 from controllers.EventController import EventController
 from controllers.LoginController import LoginController
 from controllers.PaymentController import PaymentController
-from controllers.VendoController import VendoController
 from models.Users import User
 from db.db import SessionLocal, engine, Base
 from flask_cors import CORS
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template
 from controllers.UserController import UserController
 
 class EventWebsite:
@@ -61,13 +61,15 @@ class EventWebsite:
 
         # event api
         @app.route("/api/event/create", methods=["POST"])
-        # @login_required
+        @login_required
         def create_event():
-            # if current_user.role != "admin":
-            #     return {"msg": "Only admin can create event"}, 403
-
             event = EventController()
             return event.CreateEvent()
+
+        @app.route("/api/event/get-all", methods=["GET"])
+        def get_all_events():
+            events = EventController()
+            return events.GetAll()
 
 
         @app.route("/api/event/get", methods=["GET"])
@@ -75,42 +77,63 @@ class EventWebsite:
             event = EventController()
             return event.GetAll()
 
-        #vendor api
-        @app.route("/api/vendor/create", methods=["POST"])
-        # @login_required
-        def create_vendor():
-            # if current_user.role != "admin":
-            #     return {"msg": "Only admin can create vendor"}, 403
-            vendor = VendoController()
-            return vendor.CreateVendor()
-
         # booking controller
         @app.route("/api/booking/create", methods=["POST"])
+        @login_required
         def create_booking():
             booking = BookingController()
             return booking.CreateBooking()
 
+        @app.route('/api/booking/get-my-bookings', methods=["GET"])
+        @login_required
+        def get_my_bookings():
+            booking = BookingController()
+            return booking.GetMyBookings()
+
         @app.route("/api/booking/payment/pay", methods=["POST"])
+        @login_required
         def pay_booking():
             booking = BookingController()
             return booking.PayBooking()
 
         # payment controller
+        @app.route('/api/payment/get-my-payments', methods=["GET"])
+        @login_required
+        def get_all_my_payments():
+            payment = PaymentController()
+            return payment.GetMyPayments()
+
         @app.route("/api/payment/check-status/<payment_id>", methods=["GET"])
+        @login_required
         def check_payment_status(payment_id):
             payment = PaymentController()
             return payment.CheckStatus(payment_id=payment_id)
 
         @app.route("/api/payment/create", methods=["POST"])
+        @login_required
         def create_payment():
             payment = PaymentController()
             return payment.CreatePayment()
 
-        # vendor controller
-        @app.route("/api/vendor/get", methods=["GET"])
-        def get_vendor():
-            vendor = VendoController()
-            return vendor.GetAllVendor()
+        @app.route("/api/payment/cancel", methods=["POST"])
+        @login_required
+        def cancel_payment():
+            payment = PaymentController()
+            return payment.CancelPayment()
+
+        @app.route("/api/payment/refund-my-booking", methods=["POST"])
+        @login_required
+        def refund_payment():
+            payment = PaymentController()
+            return payment.RefundPayment()
+
+
+        # admin api
+        @app.route("/api/admin/create", methods=["POST"])
+        @login_required
+        def create_admin():
+            admin = AdminController()
+            return admin.CreateAdmin()
 
         # view route
         @app.route("/", methods=["GET"])

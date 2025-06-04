@@ -1,4 +1,7 @@
+from flask_login import current_user
+
 from lib.has_time_passed import has_time_passed
+from lib.model_to_dicts import model_to_dict
 from models.Bookings import Booking
 from lib.string_func import generate_random_string
 from controllers.Controllers import Controller
@@ -13,8 +16,23 @@ class BookingController(Controller):
     def __init__(self):
         super().__init__()
 
+    def GetMyBookings(self):
+        if current_user.is_anonymous:
+            return jsonify({"msg": "User not logged in"}), 401
+
+        bookings = self._db.query(Booking).filter(Booking.user_id == current_user.id).all()
+
+        if not bookings:
+            return jsonify({"data": []}), 200
+
+        return jsonify({"data": [model_to_dict(p) for p in bookings]}), 200
+
     def CreateBooking(self):
         event_id = self.data['event_id']
+        user_id = current_user.id
+
+        if not user_id:
+            return jsonify({"msg": "User is not logged in"}), 403
 
         # Ambil data event sebagai object ORM
         event_obj = self._db.query(Event).filter(Event.id == event_id).first()
@@ -33,7 +51,8 @@ class BookingController(Controller):
             "phone": self.data['phone'],
             "email": self.data['email'],
             "address": self.data['address'],
-            "gov_id": self.data['gov_id']
+            "gov_id": self.data['gov_id'],
+            "user_id": user_id
         }
 
         # Data payment
@@ -46,7 +65,8 @@ class BookingController(Controller):
             "bank_name": self.data['bank_name'],
             "card_number": self.data['card_number'],
             "tax": tax,
-            "amount": amount
+            "amount": amount,
+            "user_id": user_id
         }
 
         # Data booking
@@ -55,7 +75,8 @@ class BookingController(Controller):
             "id": booking_id,
             "event_id": event_id,
             "customer_id": customer_data['id'],
-            "payment_id": payment_data['id']
+            "payment_id": payment_data['id'],
+            "user_id": user_id,
         }
 
         # Data ticket
@@ -63,7 +84,8 @@ class BookingController(Controller):
             "id": generate_random_string(),
             "price": price,
             "booking_id": booking_id,
-            "event_id": event_id
+            "event_id": event_id,
+            "user_id": user_id,
         }
 
         try:
@@ -102,16 +124,19 @@ class BookingController(Controller):
         payment_id = self.data['payment_id']
 
         booking = self._db.query(Booking).filter(Booking.id == booking_id).first()
-        payment = self._db.query(PaymentInfo).filter(PaymentInfo.id == payment_id).first()
-        event = self._db.query(Event).filter(Event.id == booking.event_id).first()
+        if not booking:
+            return jsonify({"msg": "Booking not found"}), 404
 
-        if not booking or not payment:
-            return jsonify({"msg": "Booking or payment not found"}), 404
+        payment = self._db.query(PaymentInfo).filter(PaymentInfo.id == payment_id).first()
+        if not payment:
+            return jsonify({"msg": "Payment not found"}), 404
+
+        event = self._db.query(Event).filter(Event.id == booking.event_id).first()
 
         # check is time is more than 30 min, than canceled booking automaticly
         if (has_time_passed(booking.created_at, 1) and payment.status != "SUCCESS"):
-            booking.payment_status = "CANCELLED"
-            payment.status = "CANCELLED"
+            booking.payment_status = "FAILED"
+            payment.status = "FAILED"
             payment.payment_date = datetime.now()
             event.current_capacity -= 1
             event.is_fullybooked = event.current_capacity >= event.capacity
@@ -120,6 +145,9 @@ class BookingController(Controller):
 
             self._db.commit()
             return jsonify({"msg": "Payment declined due to timeout"}), 200
+
+        if payment.staus == "SUCCESS":
+            return jsonify({"msg": "Already paid"}), 200
 
         booking.payment_status = "SUCCESS"
         payment.status = "SUCCESS"
@@ -132,3 +160,6 @@ class BookingController(Controller):
             print(e)
             self._db.rollback()
             return jsonify({"msg": "Failed to process payment"}), 500
+
+
+

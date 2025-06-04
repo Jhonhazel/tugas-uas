@@ -15,13 +15,9 @@ class Event(Base):
     started_at = Column(DateTime, nullable=False)
     ended_at = Column(DateTime, nullable=False)
     price = Column(Float, nullable=False)
-
     venue_address = Column(String(255), nullable=False)
     is_fullybooked = Column(Boolean, nullable=False, default=False)
 
-    vendor_id = Column(String(255), ForeignKey("vendors.id"), nullable=False, name="vendors_id")
-
-    vendor = relationship("Vendor", back_populates="events")
     bookings = relationship("Booking", back_populates="event")
     tickets = relationship("Ticket", back_populates="event")
 

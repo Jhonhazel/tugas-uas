@@ -1,1 +1,1 @@
-from models import Events, Tickets, Vendors, Users, Customers, PaymentInfo, Bookings, LoginHistory
+from models import Events, Tickets, Users, Customers, PaymentInfo, Bookings, LoginHistory

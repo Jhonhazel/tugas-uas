@@ -21,6 +21,10 @@ class User(Base, UserMixin):
 
     #relasi tabel login history
     login_history = relationship("LoginHistory", back_populates="user", cascade="all, delete-orphan")
+    customers = relationship("Customer", back_populates="user")
+    bookings = relationship("Booking", back_populates="user")
+    tickets = relationship("Ticket", back_populates="user")
+    payment_infos = relationship("PaymentInfo", back_populates="user")
 
     def __repr__(self):
         return f"<User(id={self.id}, username='{self.username}')>"

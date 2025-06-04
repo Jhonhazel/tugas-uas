@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Float, DateTime, func, Enum
+from sqlalchemy import Column, String, Float, DateTime, func, Enum, ForeignKey
+from sqlalchemy.orm import relationship
 
 from db.db import Base
 from .Enums import PaymentStatus
@@ -15,6 +16,9 @@ class PaymentInfo(Base):
     status = Column(Enum(PaymentStatus), nullable=False, default=PaymentStatus.PENDING)
     payment_date = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=func.now())
+
+    user_id = Column(String(12), ForeignKey("users.id"), nullable=True)
+    user = relationship("User", back_populates="payment_infos")
 
     def __repr__(self):
         return f"<PaymentInfo(id={self.id}, amount={self.amount}, status='{self.status}')>"
