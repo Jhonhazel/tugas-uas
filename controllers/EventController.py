@@ -1,15 +1,25 @@
+from flask_login import current_user
+
 from lib.model_to_dicts import model_to_dict
 from models.Events import Event
 from lib.string_func import generate_random_string
 from controllers.Controllers import Controller
 from flask import jsonify, request
 
+from models.Users import User
 
 class EventController(Controller):
     def __init__(self):
         super().__init__()
 
     def CreateEvent(self):
+        user_id = current_user.id
+
+        user = self._db.query(User).filter(User.id == user_id).first()
+
+        if user.role.value != "organizer":
+            return jsonify({"msg": "Unauthorized user"}), 403
+
         data = {
             "id": generate_random_string(),
             "name": self.data['name'],
@@ -36,3 +46,6 @@ class EventController(Controller):
             return jsonify({"data": []}), 200
 
         return jsonify({ "data": [model_to_dict(e) for e in event] })
+
+    def GetDetails(self, event_id):
+        pass

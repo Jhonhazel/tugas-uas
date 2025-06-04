@@ -8,6 +8,7 @@ from sqlalchemy.orm import relationship
 class RoleUser(enum.Enum):
     admin = 'admin'
     user = 'user'
+    organizer = 'organizer'
 
 class User(Base, UserMixin):
     __tablename__ = 'users'

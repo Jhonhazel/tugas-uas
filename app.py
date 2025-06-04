@@ -1,5 +1,4 @@
 from flask_login import LoginManager, login_required
-
 from controllers.AdminController import AdminController
 from controllers.BookingController import BookingController
 from controllers.EventController import EventController
@@ -17,7 +16,6 @@ class EventWebsite:
         self.app.secret_key = 'super_secret_key'
         CORS(self.app, supports_credentials=True)
         self.routes()
-
         self.login_manager = LoginManager()
         self.login_manager.init_app(self.app)
         self.login_manager.login_view='login'
@@ -72,10 +70,10 @@ class EventWebsite:
             return events.GetAll()
 
 
-        @app.route("/api/event/get", methods=["GET"])
-        def get_event():
+        @app.route("/api/event/get/details/<event_id>", methods=["GET"])
+        def get_event(event_id):
             event = EventController()
-            return event.GetAll()
+            return event.GetDetails(event_id)
 
         # booking controller
         @app.route("/api/booking/create", methods=["POST"])
@@ -127,7 +125,6 @@ class EventWebsite:
             payment = PaymentController()
             return payment.RefundPayment()
 
-
         # admin api
         @app.route("/api/admin/create", methods=["POST"])
         @login_required
@@ -152,6 +149,18 @@ class EventWebsite:
         @login_required
         def dashboard():
             return render_template("dashboard.html")
+
+        @app.route('/user_tiket', methods=["GET"])
+        def user_tiket():
+            return render_template("user_tiket.html")
+
+        @app.route('/event/detail/<event_id>')
+        def event_detail(event_id):
+            event = EventController()
+
+            data_event = event.GetDetails(event_id)
+
+
 
 
 
