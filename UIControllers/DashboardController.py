@@ -15,10 +15,10 @@ class Dashboard:
 class AdminDashboard(Dashboard):
     def get_sidebar_items(self):
         return [
-            {"icon": "layout-dashboard", "label": "Dashboard"},
-            {"icon": "shopping-cart", "label": "Pesanan"},
-            {"icon": "users", "label": "Pengguna"},
-            {"icon": "settings", "label": "Pengaturan"},
+            {"icon": "layout-dashboard", "label": "Dashboard", "route": "admin_dashboard"},
+            {"icon": "shopping-cart", "label": "Pesanan", "route": "pesanan"},
+            {"icon": "users", "label": "Pengguna", "route": "dashboard_users"},
+            {"icon": "settings", "label": "Pengaturan", "route": "pengaturan"},
         ]
 
     def get_main_message(self):
@@ -31,9 +31,9 @@ class AdminDashboard(Dashboard):
 class OrganizerDashboard(Dashboard):
     def get_sidebar_items(self):
         return [
-            {"icon": "layout-dashboard", "label": "Dashboard"},
-            {"icon": "shopping-cart", "label": "Event Saya"},
-            {"icon": "bar-chart-3", "label": "Laporan"},
+            {"icon": "layout-dashboard", "label": "Dashboard", "route": "dashboard_view"},
+            {"icon": "shopping-cart", "label": "Event Saya", "route": "dashboard_view"},
+            {"icon": "bar-chart-3", "label": "Laporan", "route": "dashboard_view"},
         ]
 
     def get_main_message(self):
@@ -47,8 +47,8 @@ class UserDashboard(Dashboard):
     def get_sidebar_items(self):
         return [
             {"icon": "user-circle", "label": "Profile", "route": "profile"},
-            {"icon": "shopping-cart", "label": "Tiket Saya", "route": "user_tiket"},
-            {"icon": "bar-chart-3", "label": "Riwayat", "route": "dashboard_view"},
+            {"icon": "ticket", "label": "Tiket Saya", "route": "user_tiket"},
+            {"icon": "history", "label": "Riwayat", "route": "riwayat_tiket"},
         ]
 
     def get_main_message(self):

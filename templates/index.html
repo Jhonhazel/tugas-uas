@@ -29,13 +29,21 @@
             Tiket Saya
           </a>          
 
-      <a href="{{ url_for('dashboard_view') }}" class="flex items-center cursor-pointer select-none">
-        <span class="mr-3 font-medium">
-          {{ current_user.username if current_user.is_authenticated else 'Guest' }}
-        </span>
-        <img src="https://placehold.co/40x40/FFFFFF/3B82F6?text={{ current_user.username[0] | upper }}" alt="Avatar Pengguna"
-        class="w-10 h-10 rounded-full border-2 border-blue-500 object-cover hover:opacity-80 transition-opacity">
-      </a>      
+          <a href="{{ url_for('dashboard_view') }}" class="flex items-center cursor-pointer select-none">
+            <span class="mr-3 font-medium">
+              {{ current_user.username if current_user.is_authenticated else 'Guest' }}
+            </span>
+            
+            {% if current_user.is_authenticated %}
+              <img src="https://placehold.co/40x40/FFFFFF/3B82F6?text={{ current_user.username[0] | upper }}" 
+                   alt="Avatar Pengguna"
+                   class="w-10 h-10 rounded-full border-2 border-blue-500 object-cover hover:opacity-80 transition-opacity">
+            {% else %}
+              <img src="https://placehold.co/40x40/FFFFFF/3B82F6?text=G" 
+                   alt="Avatar Pengguna Guest"
+                   class="w-10 h-10 rounded-full border-2 border-blue-500 object-cover hover:opacity-80 transition-opacity">
+            {% endif %}
+          </a>
     </div>
   </nav>
 

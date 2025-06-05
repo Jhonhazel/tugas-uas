@@ -218,7 +218,7 @@
                                class="profile-dropdown-item flex items-center text-sm text-gray-700 hover:bg-gray-100 hover:text-custom-dark-blue-gray rounded-md mx-1 my-0.5">
                                 <i data-lucide="user-circle" class="lucide inline-block"></i>Profile
                             </a>
-                            <a href="#"
+                            <a href="{{ url_for('activity_log') }}"
                                class="profile-dropdown-item flex items-center text-sm text-gray-700 hover:bg-gray-100 hover:text-custom-dark-blue-gray rounded-md mx-1 my-0.5">
                                 <i data-lucide="history" class="lucide inline-block"></i>Activity Log
                             </a>
@@ -333,7 +333,6 @@
     </aside>
 </div>
 
-<script src="static/dashboard.js" defer>
-</script>
+<script src="{{ url_for('static', filename='dashboard.js') }}" defer></script>
 </body>
 </html>
