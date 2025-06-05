@@ -1,0 +1,163 @@
+{% extends "dashboard.html" %}
+{% block page_title %}Dashboard Events{% endblock %}
+
+{% block main_content %}
+<div class="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow text-gray-800 space-y-10">
+
+  <!-- Events Table -->
+  <section>
+    <h2 class="text-2xl font-bold mb-4 text-custom-dark-blue-gray">Events</h2>
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
+      <table class="min-w-full divide-y divide-gray-200 table-auto">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Capacity</th>
+            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Current Capacity</th>
+            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tickets Count</th>
+            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Started At</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ended At</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor ID</th>
+            <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Fully Booked</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Venue Address</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for event in events %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-2 whitespace-nowrap">{{ event.id }}</td>
+            <td class="px-4 py-2 whitespace-nowrap font-semibold">{{ event.name }}</td>
+            <td class="px-4 py-2 max-w-xs truncate">{{ event.description }}</td>
+            <td class="px-4 py-2 text-right">{{ event.capacity }}</td>
+            <td class="px-4 py-2 text-right">{{ event.current_capacity }}</td>
+            <td class="px-4 py-2 text-right">{{ event.tickets_count }}</td>
+            <td class="px-4 py-2 text-right">${{ "%.2f"|format(event.price) }}</td>
+            <td class="px-4 py-2">{{ event.startedAt }}</td>
+            <td class="px-4 py-2">{{ event.endedAt }}</td>
+            <td class="px-4 py-2">{{ event.vendors_id }}</td>
+            <td class="px-4 py-2 text-center">
+              {% if event.is_fullybooked %}
+                <span class="text-red-600 font-semibold">Yes</span>
+              {% else %}
+                <span class="text-green-600 font-semibold">No</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-2 max-w-xs truncate">{{ event.venue_adress }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="12" class="text-center py-4 text-gray-500">No events available</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Bookings Table -->
+  <section>
+    <h2 class="text-2xl font-bold mb-4 text-custom-dark-blue-gray">Bookings</h2>
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
+      <table class="min-w-full divide-y divide-gray-200 table-auto">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer ID</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event ID</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ticket ID</th>
+            <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Status</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment ID</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fullname</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for booking in bookings %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-2 whitespace-nowrap">{{ booking.id }}</td>
+            <td class="px-4 py-2 whitespace-nowrap">{{ booking.customer_id }}</td>
+            <td class="px-4 py-2">{{ booking.phone }}</td>
+            <td class="px-4 py-2 whitespace-nowrap">{{ booking.event_id }}</td>
+            <td class="px-4 py-2 whitespace-nowrap">{{ booking.ticket_id }}</td>
+            <td class="px-4 py-2 text-center">
+              {% if booking.payment_status == 'paid' %}
+                <span class="text-green-600 font-semibold">Paid</span>
+              {% elif booking.payment_status == 'pending' %}
+                <span class="text-yellow-600 font-semibold">Pending</span>
+              {% else %}
+                <span class="text-red-600 font-semibold">Failed</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-2">{{ booking.payment_method }}</td>
+            <td class="px-4 py-2 whitespace-nowrap">{{ booking.createdAt }}</td>
+            <td class="px-4 py-2 whitespace-nowrap">{{ booking.user_id }}</td>
+            <td class="px-4 py-2 whitespace-nowrap">{{ booking.payment_id }}</td>
+            <td class="px-4 py-2">{{ booking.fullname }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="11" class="text-center py-4 text-gray-500">No bookings available</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Payment Info Table -->
+  <section>
+    <h2 class="text-2xl font-bold mb-4 text-custom-dark-blue-gray">Payment Info</h2>
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
+      <table class="min-w-full divide-y divide-gray-200 table-auto">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bank Name</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Card Number</th>
+            <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Date</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
+            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Tax</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          {% for payment in payment_info %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-2 whitespace-nowrap">{{ payment.id }}</td>
+            <td class="px-4 py-2">{{ payment.method }}</td>
+            <td class="px-4 py-2">{{ payment.bank_name }}</td>
+            <td class="px-4 py-2">{{ payment.card_number }}</td>
+            <td class="px-4 py-2 text-center">
+              {% if payment.status == 'completed' %}
+                <span class="text-green-600 font-semibold">Completed</span>
+              {% elif payment.status == 'pending' %}
+                <span class="text-yellow-600 font-semibold">Pending</span>
+              {% else %}
+                <span class="text-red-600 font-semibold">Failed</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-2 text-right">${{ "%.2f"|format(payment.amount) }}</td>
+            <td class="px-4 py-2 whitespace-nowrap">{{ payment.payment_date }}</td>
+            <td class="px-4 py-2 whitespace-nowrap">{{ payment.user_id }}</td>
+            <td class="px-4 py-2 text-right">{{ payment.tax }}%</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="9" class="text-center py-4 text-gray-500">No payment info available</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

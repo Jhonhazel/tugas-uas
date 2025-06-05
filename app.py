@@ -10,13 +10,21 @@ from models.Bookings import Booking
 from models.Events import Event
 from models.Enums import PaymentStatus
 from models.LoginHistory import LoginHistory
+from models.PaymentInfo import PaymentInfo
+from models.Vendors import Vendor
+from models.Tickets import Ticket
+from models.Users import User
+from models.Customers import Customer
 from db.db import SessionLocal, engine
 from db.base import Base
 from flask_cors import CORS
-from flask import Flask, render_template, redirect, url_for, request, abort, flash
+from flask import Flask, render_template, redirect, url_for, request, abort, flash, make_response
 from controllers.UserController import UserController
 from UIControllers.DashboardController import AdminDashboard, OrganizerDashboard, UserDashboard, Dashboard
 from config import APP_NAME, MAINTENANCE_MODE, DEFAULT_ROLE
+import pdfkit
+from datetime import datetime
+import uuid
 
 class EventWebsite:
     def __init__(self):
@@ -384,10 +392,272 @@ class EventWebsite:
             }
 
             return render_template('pengaturan.html', sidebar_items=dashboard.get_sidebar_items(), pengaturan=pengaturan)
+        
+        @app.route('/organizer/dashboard')
+        @login_required
+        def organizer_dashboard():
+            if current_user.role.value != 'organizer':
+                return redirect(url_for('dashboard_view'))
+            
+            dashboard = OrganizerDashboard(current_user)
+
+            session = SessionLocal()
+
+            # Ambil event yang dibuat oleh organizer ini
+            organizer_events = session.query(Event).filter_by(vendor_id=current_user.id).all()
+            event_ids = [event.id for event in organizer_events]
+            bookings = session.query(Booking).filter(Booking.event_id.in_(event_ids)).all()
+
+            # Booking terkait event organizer ini
+            payment_ids = [b.payment_id for b in bookings if b.payment_id is not None]
+
+
+            # Payment info yang berkaitan (asumsikan user_id = current_user.id)
+            payments = session.query(PaymentInfo).filter(PaymentInfo.id.in_(payment_ids)).all()
+
+            session.close()
+
+            return render_template('dashboard_organizer.html', 
+                                sidebar_items=dashboard.get_sidebar_items(),
+                                page_title="Dashboard Organizer",
+                                events=organizer_events,
+                                bookings=bookings,
+                                payment_info=payments)
+
+        @app.route("/my-events")
+        @login_required
+        def my_events():
+            session = SessionLocal()
+            try:
+                events = session.query(Event).filter_by(vendor_id=current_user.id).all()
+
+                event_data = []
+                dashboard = OrganizerDashboard(current_user)
+                for event in events:
+                    tickets = session.query(Ticket).filter_by(event_id=event.id).all()
+                    bookings = session.query(Booking).filter_by(event_id=event.id).all()
+                    booking_ids = [b.id for b in bookings]
+                    payments = session.query(PaymentInfo).filter(PaymentInfo.booking_id.in_(booking_ids)).all()
+
+                    total_income = sum(p.amount for p in payments)
+                    tickets_sold = len(tickets)
+
+                    event_data.append({
+                        'id': event.id,
+                        'name': event.name,
+                        'date': event.started_at.strftime("%Y-%m-%d %H:%M"),
+                        'price': event.price,
+                        'tickets_sold': tickets_sold,
+                        'total_income': total_income
+                    })
+
+                return render_template("my_events.html", sidebar_items=dashboard.get_sidebar_items(), events=event_data)
+            finally:
+                session.close()
+
+
+        @app.route("/add-event", methods=["GET", "POST"])
+        @login_required
+        def add_event():
+            dashboard = OrganizerDashboard(current_user)
+            
+            if request.method == "POST":
+                name = request.form.get("name")
+                date = request.form.get("date")
+                price = request.form.get("price")
+
+                if not name or not date or not price:
+                    flash("Semua field harus diisi.", "danger")
+                    return redirect(url_for("add_event"))
+
+                session = SessionLocal()
+                try:
+                    new_event = Event(
+                        name=name,
+                        description="Deskripsi default",
+                        price=float(price),
+                        started_at=date,
+                        ended_at=date,  # Ubah jika kamu punya input waktu selesai
+                        capacity=100,
+                        current_capacity=0,
+                        tikets_count=0,
+                        venue_address="Belum ditentukan",
+                        is_fullybooked=False,
+                        vendor_id=current_user.id
+                    )
+                    session.add(new_event)
+                    session.commit()
+                    flash("Event berhasil ditambahkan.", "success")
+                finally:
+                    session.close()
+
+                return redirect(url_for("my_events"))
+
+            return render_template("add_event.html", sidebar_items=dashboard.get_sidebar_items())
+
+        @app.route("/edit-event/<string:event_id>", methods=["GET", "POST"])
+        @login_required
+        def edit_event(event_id):
+            session = SessionLocal()
+            try:
+                event = session.query(Event).filter_by(id=event_id).first()
+                dashboard = OrganizerDashboard(current_user)
+
+                if not event:
+                    flash("Event tidak ditemukan.", "danger")
+                    return redirect(url_for("my_events"))
+
+                if event.vendor_id != current_user.id:
+                    flash("Anda tidak memiliki izin untuk mengedit event ini.", "danger")
+                    return redirect(url_for("my_events"))
+
+                if request.method == "POST":
+                    event.name = request.form.get("name")
+                    event.started_at = request.form.get("date")
+                    event.ended_at = request.form.get("date")
+                    event.price = float(request.form.get("price"))
+
+                    session.commit()
+                    flash("Event berhasil diperbarui.", "success")
+                    return redirect(url_for("my_events"))
+
+                return render_template("add_event.html", sidebar_items=dashboard.get_sidebar_items(), event=event)
+            finally:
+                session.close()
 
 
 
+        @app.route("/delete-event/<string:event_id>", methods=["POST"])
+        @login_required
+        def delete_event(event_id):
+            session = SessionLocal()
+            try:
+                event = session.query(Event).filter_by(id=event_id).first()
 
+                if not event:
+                    flash("Event tidak ditemukan.", "danger")
+                    return redirect(url_for("my_events"))
+
+                if event.vendor_id != current_user.id:
+                    flash("Anda tidak memiliki izin untuk menghapus event ini.", "danger")
+                    return redirect(url_for("my_events"))
+
+                session.delete(event)
+                session.commit()
+                flash("Event berhasil dihapus.", "success")
+                return redirect(url_for("my_events"))
+            finally:
+                session.close()
+        
+        @app.route("/laporan")
+        @login_required
+        def laporan():
+            session = SessionLocal()
+            vendor_events = session.query(Event).filter_by(vendor_id=current_user.id).all()
+
+            laporan_data = []
+            dashboard = OrganizerDashboard(current_user)
+            for event in vendor_events:
+                bookings = session.query(Booking).filter_by(event_id=event.id).all()
+                user_ids = list(set(b.user_id for b in bookings))
+                tickets = session.query(Ticket).filter_by(event_id=event.id).all()
+                payments = session.query(PaymentInfo).filter(PaymentInfo.booking_id.in_([b.id for b in bookings])).all()
+                customers = session.query(Customer).filter(Customer.user_id.in_(user_ids)).all()
+
+                laporan_data.append({
+                    'id': event.id,
+                    'name': event.name,
+                    'tickets_sold': len(tickets),
+                    'total_income': sum(p.amount for p in payments),
+                    'customers': customers
+                })
+
+            session.close()
+            return render_template("laporan.html", sidebar_items=dashboard.get_sidebar_items(), events=laporan_data)
+
+        @app.route("/download-laporan/<string:event_id>")
+        @login_required
+        def download_laporan(event_id):
+            session = SessionLocal()
+
+            # Ambil event berdasarkan ID
+            event = session.query(Event).filter_by(id=event_id).first()
+            if not event:
+                abort(404, description="Event tidak ditemukan")
+
+            # Cek apakah user saat ini adalah pemilik event (penyelenggara/vendor)
+            if event.vendor_id != current_user.id:
+                abort(403, description="Anda tidak memiliki akses ke laporan ini")
+
+            # Ambil semua booking dan ticket terkait
+            bookings = session.query(Booking).filter_by(event_id=event.id).all()
+            tickets = session.query(Ticket).filter_by(event_id=event.id).all()
+
+            # Ambil payment info berdasarkan booking_id
+            booking_ids = [b.id for b in bookings]
+            payments = session.query(PaymentInfo).filter(PaymentInfo.booking_id.in_(booking_ids)).all()
+
+            # Hitung total income dan jumlah tiket terjual
+            total_income = sum(p.amount for p in payments)
+            tickets_sold = len(tickets)
+
+            # Susun data untuk dikirim ke template HTML
+            event_data = {
+                'id': event.id,
+                'name': event.name,
+                'started_at': event.started_at,
+                'ended_at': event.ended_at,
+                'venue_address': event.venue_address,
+                'tickets_sold': tickets_sold,
+                'total_income': total_income
+            }
+
+            # Render template dan convert ke PDF
+            rendered = render_template("event_pdf.html", event=event_data)
+            pdf = pdfkit.from_string(rendered, False)
+
+            # Kembalikan sebagai file yang bisa didownload
+            response = make_response(pdf)
+            response.headers["Content-Type"] = "application/pdf"
+            response.headers["Content-Disposition"] = f"attachment; filename=laporan_{event.id}.pdf"
+            return response
+        
+        @app.route("/download-customers/<string:event_id>")
+        @login_required
+        def download_customers(event_id):
+            session = SessionLocal()
+
+            # Ambil event berdasarkan ID
+            event = session.query(Event).filter_by(id=event_id).first()
+            if not event:
+                abort(404, description="Event tidak ditemukan")
+
+            # Cek apakah user saat ini adalah pemilik event (penyelenggara/vendor)
+            if event.vendor_id != current_user.id:
+                abort(403, description="Anda tidak memiliki akses ke laporan ini")
+
+            # Ambil semua customer yang melakukan booking untuk event ini
+            customers = session.query(Customer).join(Booking).filter(Booking.event_id == event.id).all()
+
+            # Susun data untuk dikirim ke template HTML
+            event_data = {
+                'id': event.id,
+                'name': event.name,
+                'started_at': event.started_at,
+                'ended_at': event.ended_at,
+                'venue_address': event.venue_address
+            }
+
+            # Render template dan convert ke PDF
+            rendered = render_template("customers_pdf.html", event=event_data, customers=customers)
+            pdf = pdfkit.from_string(rendered, False)
+
+            # Kembalikan sebagai file yang bisa didownload
+            response = make_response(pdf)
+            response.headers["Content-Type"] = "application/pdf"
+            response.headers["Content-Disposition"] = f"attachment; filename=daftar_customer_{event.id}.pdf"
+            return response
+        
 
     def run(self):
         self.app.run(debug=True, port=5555)

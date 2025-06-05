@@ -31,9 +31,9 @@ class AdminDashboard(Dashboard):
 class OrganizerDashboard(Dashboard):
     def get_sidebar_items(self):
         return [
-            {"icon": "layout-dashboard", "label": "Dashboard", "route": "dashboard_view"},
-            {"icon": "shopping-cart", "label": "Event Saya", "route": "dashboard_view"},
-            {"icon": "bar-chart-3", "label": "Laporan", "route": "dashboard_view"},
+            {"icon": "layout-dashboard", "label": "Dashboard", "route": "organizer_dashboard"},
+            {"icon": "shopping-cart", "label": "Event Saya", "route": "my_events"},
+            {"icon": "bar-chart-3", "label": "Laporan", "route": "laporan"},
         ]
 
     def get_main_message(self):
