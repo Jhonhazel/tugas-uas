@@ -24,16 +24,11 @@
                 <span class="font-semibold w-32">Email:</span>
                 <span>{{ current_user.email }}</span>
             </div>
-            <div class="flex items-center">
-                <i data-lucide="shield-check" class="lucide mr-2 text-purple-600 w-5 h-5"></i>
-                <span class="font-semibold w-32">Role:</span>
-                <span>{{ current_user.role.value }}</span>
-            </div>
         </div>
 
         <div class="mt-6">
             <a href="{{ url_for('index') }}" class="text-blue-600 hover:underline text-sm">
-                &larr; Kembali ke Dashboard
+                &larr; Kembali
             </a>
         </div>
     </div>

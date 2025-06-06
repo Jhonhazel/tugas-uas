@@ -1,9 +1,12 @@
 from flask_login import LoginManager, login_required
+
+from constant.constant import DASHBOARD_UI_LIST
 from controllers.AdminController import AdminController
 from controllers.BookingController import BookingController
 from controllers.EventController import EventController
 from controllers.LoginController import LoginController
 from controllers.PaymentController import PaymentController
+from lib.get_current_user import get_current_user
 from models.Users import User
 from db.db import SessionLocal, engine, Base
 from flask_cors import CORS
@@ -45,7 +48,7 @@ class EventWebsite:
             return login.Login()
 
 
-        @app.route("/api/user/logout", methods=["GET","POST"])
+        @app.route("/api/user/logout", methods=["GET"])
         @login_required
         def logout_user():
             login = LoginController()
@@ -135,8 +138,42 @@ class EventWebsite:
         # view route
         @app.route("/", methods=["GET"])
         def index():
-            return render_template("index.html")
+            current_user = get_current_user()
+            return render_template("index.html", current_user=current_user)
 
+        # dashboard ui
+        @app.route("/admin/dashboard", methods=["GET"])
+        @login_required
+        def dashboard():
+            user = get_current_user()
+            sidebar_items = DASHBOARD_UI_LIST[user["role"]]
+            return render_template("dashboard.html", sidebar_items=sidebar_items)
+
+        @app.route("/pesanan", methods=["GET"])
+        def pesanan():
+            return render_template("pesanan.html")
+        @app.route("/admin/dashboard/user", methods=["GET"])
+        def dashboard_user():
+            current_user = get_current_user()
+            return render_template("pengguna.html", current_user=current_user)
+        @app.route("/admin/dashboard/pengaturan", methods=["GET"])
+        def dashboard_pengaturan():
+            current_user = get_current_user()
+            return render_template("pengaturan.html", current_user=current_user)
+
+        @app.route('/user_tiket', methods=["GET"])
+        def user_tiket():
+            return render_template("user_tiket.html")
+
+        @app.route('/profile', methods=["GET"])
+        def profile():
+            return render_template("profile.html")
+
+        @app.route('/activity_log', methods=["GET"])
+        def activity_log():
+            return render_template("activity_log.html")
+
+    #     auth ui
         @app.route("/login", methods=["GET"])
         def login():
             return render_template("login.html")
@@ -144,24 +181,6 @@ class EventWebsite:
         @app.route("/register", methods=["GET"])
         def register():
             return render_template("register.html")
-
-        @app.route("/dashboard", methods=["GET"])
-        @login_required
-        def dashboard():
-            return render_template("dashboard.html")
-
-        @app.route('/user_tiket', methods=["GET"])
-        def user_tiket():
-            return render_template("user_tiket.html")
-
-        @app.route('/event/detail/<event_id>')
-        def event_detail(event_id):
-            event = EventController()
-
-            data_event = event.GetDetails(event_id)
-
-
-
 
 
     def run(self):

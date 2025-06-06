@@ -26,7 +26,14 @@ loginBtn.addEventListener("click", async () => {
             console.log(await res.json())
             return alert("Terjadi kesalahan saat login!")
         }
-        window.location.replace('/dashboard')
+        const {data} = await res.json()
+
+        if (data.role === "user") {
+            window.location.replace("/")
+        } else {
+            window.location.replace('/dashboard')
+        }
+
     } catch (error) {
         console.log(error)
     }

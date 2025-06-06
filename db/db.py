@@ -1,4 +1,3 @@
-from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 from env_local import DB_USER, DB_PASS, DB_HOST, DB_NAME
