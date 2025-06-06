@@ -1,0 +1,56 @@
+{% extends "dashboard.html" %}
+{% block page_title %}Event Saya{% endblock %}
+
+{% block main_content %}
+<div class="max-w-6xl mx-auto bg-white rounded-lg shadow p-6 text-gray-800">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-custom-dark-blue-gray">Event Saya</h2>
+        <a href="{{ url_for('add_event') }}"
+           class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+            + Tambah Event
+        </a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+            <thead class="bg-gray-100 text-gray-700 text-sm uppercase">
+                <tr>
+                    <th class="py-3 px-4 border-b text-left">Nama Event</th>
+                    <th class="py-3 px-4 border-b text-left">Tanggal</th>
+                    <th class="py-3 px-4 border-b text-left">Harga Tiket</th>
+                    <th class="py-3 px-4 border-b text-left">Tiket Terjual</th>
+                    <th class="py-3 px-4 border-b text-left">Pendapatan</th>
+                    <th class="py-3 px-4 border-b text-center">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                <tr class="border-b hover:bg-gray-50 transition">
+                    <td class="py-3 px-4">{{ event.name }}</td>
+                    <td class="py-3 px-4">{{ event.date.strftime('%d %b %Y') }}</td>
+                    <td class="py-3 px-4">Rp {{ event.price | int }}</td>
+                    <td class="py-3 px-4">{{ event.tickets_sold }}</td>
+                    <td class="py-3 px-4">Rp {{ event.total_income | int }}</td>
+                    <td class="py-3 px-4 text-center space-x-3 whitespace-nowrap">
+                        <a href="{{ url_for('edit_event', event_id=event.id) }}"
+                           class="text-blue-600 hover:underline">Edit</a>
+
+                        <form action="{{ url_for('delete_event', event_id=event.id) }}" method="POST" class="inline">
+                            <button type="submit" class="text-red-600 hover:underline"
+                                    onclick="return confirm('Yakin ingin menghapus event ini?')">Hapus</button>
+                        </form>
+
+                        <a href="{{ url_for('download_customers', event_id=event.id) }}"
+                           class="text-green-600 hover:underline">Unduh</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-6 text-gray-500">Belum ada event yang ditambahkan.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "dashboard.html" %}
+{% block page_title %}Manajemen Pengguna{% endblock %}
+
+{% block main_content %}
+<div class="max-w-7xl mx-auto bg-white rounded-lg shadow p-6 text-gray-800">
+    <h2 class="text-2xl font-bold text-custom-dark-blue-gray mb-6">Manajemen Pengguna</h2>
+
+    {% if users %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full border border-gray-200 text-sm">
+                <thead class="bg-gray-100 text-gray-700 uppercase text-xs tracking-wider">
+                    <tr>
+                        <th class="px-4 py-3 border-b text-left">#</th>
+                        <th class="px-4 py-3 border-b text-left">Username</th>
+                        <th class="px-4 py-3 border-b text-left">Email</th>
+                        <th class="px-4 py-3 border-b text-left">Role</th>
+                        <th class="px-4 py-3 border-b text-left">Dibuat</th>
+                        <th class="px-4 py-3 border-b text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr class="hover:bg-slate-50">
+                            <td class="px-4 py-2 border-b">{{ loop.index }}</td>
+                            <td class="px-4 py-2 border-b">{{ user.username }}</td>
+                            <td class="px-4 py-2 border-b">{{ user.email }}</td>
+                            <td class="px-4 py-2 border-b">
+                                <form method="POST" action="{{ url_for('ubah_role_user', user_id=user.id) }}">
+                                    <select name="role" onchange="this.form.submit()" class="text-sm border rounded px-2 py-1">
+                                        <option value="user" {% if user.role.value == 'user' %}selected{% endif %}>User</option>
+                                        <option value="organizer" {% if user.role.value == 'organizer' %}selected{% endif %}>Organizer</option>
+                                        <option value="admin" {% if user.role.value == 'admin' %}selected{% endif %}>Admin</option>
+                                    </select>
+                                </form>
+                            </td>
+                            <td class="px-4 py-2 border-b">{{ user.created_at.strftime('%d %B %Y') }}</td>
+                            <td class="px-4 py-2 border-b">
+                                {% if user.id != current_user.id %}
+                                <form method="POST" action="{{ url_for('hapus_user', user_id=user.id) }}" onsubmit="return confirm('Yakin ingin menghapus pengguna ini?');">
+                                    <button type="submit" class="text-red-600 hover:underline text-sm">Hapus</button>
+                                </form>
+                                {% else %}
+                                    <span class="text-gray-400 text-sm">Tidak bisa hapus diri sendiri</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-gray-500">Belum ada pengguna yang terdaftar.</p>
+    {% endif %}
+</div>
+{% endblock %}

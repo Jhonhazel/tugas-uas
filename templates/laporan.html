@@ -1,0 +1,52 @@
+{% extends "dashboard.html" %}
+{% block page_title %}Laporan Event{% endblock %}
+
+{% block main_content %}
+<div class="max-w-6xl mx-auto bg-white rounded-lg shadow p-6 text-gray-800">
+    <h2 class="text-2xl font-bold mb-4 text-custom-dark-blue-gray">Laporan Event</h2>
+
+    {% for event in events %}
+    <div class="border border-gray-200 rounded-md p-4 mb-6">
+        <h3 class="text-lg font-semibold text-blue-700 mb-2">{{ event.name }}</h3>
+        <p class="text-sm text-gray-600 mb-1">Total Tiket Terjual: <strong>{{ event.tickets_sold }}</strong></p>
+        <p class="text-sm text-gray-600 mb-1">Total Pendapatan: <strong>Rp {{ event.total_income }}</strong></p>
+        
+        <div class="mt-2 flex flex-wrap gap-2">
+            <a href="{{ url_for('download_laporan', event_id=event.id) }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm">
+                Download Laporan Event
+            </a>
+            <a href="{{ url_for('download_customers_pdf', event_id=event.id) }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
+                Download Daftar Customer
+            </a>
+        </div>
+
+        <div class="mt-4 overflow-x-auto">
+            <table class="w-full table-auto text-sm border border-gray-300">
+                <thead class="bg-gray-100 text-gray-700">
+                    <tr>
+                        <th class="px-4 py-2 border">Nama</th>
+                        <th class="px-4 py-2 border">Email</th>
+                        <th class="px-4 py-2 border">Telepon</th>
+                        <th class="px-4 py-2 border">Alamat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cust in event.customers %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-2 border">{{ cust.first_name }} {{ cust.last_name }}</td>
+                        <td class="px-4 py-2 border">{{ cust.email }}</td>
+                        <td class="px-4 py-2 border">{{ cust.phone }}</td>
+                        <td class="px-4 py-2 border">{{ cust.address }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center text-gray-400 py-3">Belum ada customer.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
