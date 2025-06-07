@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pembayaran Berhasil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    {{ moment.include_moment() }}
+</head>
+<body class="w-full h-screen flex items-center justify-center flex-col">
+    <div class="w-full flex items-center justify-center flex-col">
+        <svg fill="#2bb14c" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink" width="256px" height="256px" viewBox="-4.46 -4.46 53.57 53.57"
+             xml:space="preserve" stroke="#2bb14c" transform="rotate(0)"><g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_iconCarrier"> <g> <g> <path
+                    d="M39.829,0H4.819C2.518,0,0.654,1.838,0.654,4.14v25.511c0,1.438,0.742,2.776,1.963,3.537l17.39,10.829 c1.342,0.836,3.04,0.841,4.387,0.013l17.619-10.845c1.23-0.758,1.98-2.101,1.98-3.547V4.14C43.994,1.839,42.13,0,39.829,0z M33.196,17.583l-11.691,11.69c-1.033,1.033-2.708,1.033-3.74,0l-5.794-5.794c-0.497-0.496-0.775-1.169-0.775-1.87 c0-0.702,0.278-1.374,0.775-1.87v-0.001c0.496-0.496,1.168-0.774,1.87-0.774c0.701,0,1.373,0.279,1.868,0.775l3.453,3.453 c0.126,0.125,0.296,0.196,0.472,0.196c0.178,0,0.348-0.07,0.474-0.196l9.348-9.348c0.497-0.496,1.17-0.775,1.871-0.774 c0.7,0,1.374,0.278,1.87,0.775l0,0C34.228,14.876,34.228,16.55,33.196,17.583z"></path> </g> </g> </g></svg>
+        <h1 class="text-4xl font-bold mt-8">Terima kasih! pembayaran mu berhasil!</h1>
+    </div>
+{#<div class="w-[540px] p-6 bg-white border border-gray-200 rounded-lg shadow-sm mt-8">#}
+{#    <h2 class="font-bold text-xl">Rincian order</h2>#}
+{#    <div class="w-full flex items-center justify-between mt-4">#}
+{#        <span class="text-gray-400">Total</span>#}
+{#        <div class="space-y-3 text-end">#}
+{#            <span class="block font-bold">Rp {{ '{:,.0f}'.format(payment_data.amount) }}</span>#}
+{#        </div>#}
+{#    </div>#}
+{#    <div class="w-full flex items-center justify-between mt-4">#}
+{#        <span class="text-gray-400">Bank</span>#}
+{#        <div class="flex items-center space-x-4 h-full">#}
+{#            <img src="/static/img/bank/{{ payment_data.bank_name.lower() }}.svg" class="w-[55px]" />#}
+{#            <p class="text-xs font-bold select-none">[* {{ payment_data.card_number[-4:] }}]</p>#}
+{#        </div>#}
+{#    </div>#}
+{#    <div class="w-full flex items-center justify-between mt-4">#}
+{#        <span class="text-gray-400">Tanggal Pembayaran</span>#}
+{#        <span class="font-bold text-sm">{{ moment(payment_data.payment_date).format('LL, HH:mm') }}</span>#}
+{#    </div>#}
+{#</div>#}
+
+    <a href="/" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 w-[540px] mt-7 text-center">OK!</a>
+</body>
+</html>

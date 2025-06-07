@@ -1,17 +1,20 @@
-from flask_login import LoginManager, login_required
-
-from constant.constant import DASHBOARD_UI_LIST
+from flask_login import LoginManager, login_required, current_user
+from constant.constant import DASHBOARD_UI_LIST, BANK_LIST, CARD_TYPE
 from controllers.AdminController import AdminController
 from controllers.BookingController import BookingController
 from controllers.EventController import EventController
 from controllers.LoginController import LoginController
 from controllers.PaymentController import PaymentController
+from controllers.PaymentMethodController import PaymentMethodController
 from lib.get_current_user import get_current_user
+from models.PaymentMethod import PaymentMethod
 from models.Users import User
 from db.db import SessionLocal, engine, Base
 from flask_cors import CORS
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from controllers.UserController import UserController
+from flask_moment import Moment
+from cryptography.fernet import Fernet
 
 class EventWebsite:
     def __init__(self):
@@ -22,7 +25,8 @@ class EventWebsite:
         self.login_manager = LoginManager()
         self.login_manager.init_app(self.app)
         self.login_manager.login_view='login'
-        self.login_manager.user_loader(self.load_user)  # ⬅️ daftarkan loader-nya
+        self.login_manager.user_loader(self.load_user)
+        self.moment = Moment(self.app)
 
         # Base.metadata.drop_all(bind=engine)
         Base.metadata.create_all(bind=engine)
@@ -71,12 +75,6 @@ class EventWebsite:
         def get_all_events():
             events = EventController()
             return events.GetAll()
-
-
-        @app.route("/api/event/get/details/<event_id>", methods=["GET"])
-        def get_event(event_id):
-            event = EventController()
-            return event.GetDetails(event_id)
 
         # booking controller
         @app.route("/api/booking/create", methods=["POST"])
@@ -135,6 +133,19 @@ class EventWebsite:
             admin = AdminController()
             return admin.CreateAdmin()
 
+        # paymenet method api
+        @app.route('/api/payment/method/add', methods=["POST"])
+        @login_required
+        def add_payment_method():
+            payment = PaymentMethodController()
+            return payment.CreatePaymentMethod()
+
+        @app.route('/api/payment/method/remove', methods=["DELETE"])
+        @login_required
+        def remove_payment_method():
+            payment = PaymentMethodController()
+            return payment.DeletePaymentMethod()
+
         # view route
         @app.route("/", methods=["GET"])
         def index():
@@ -147,27 +158,61 @@ class EventWebsite:
         def dashboard():
             user = get_current_user()
             sidebar_items = DASHBOARD_UI_LIST[user["role"]]
+            print(sidebar_items)
             return render_template("dashboard.html", sidebar_items=sidebar_items)
 
         @app.route("/pesanan", methods=["GET"])
         def pesanan():
-            return render_template("pesanan.html")
+            user = get_current_user()
+            sidebar_items = DASHBOARD_UI_LIST[user["role"]]
+            return render_template("pesanan.html", sidebar_items=sidebar_items)
         @app.route("/admin/dashboard/user", methods=["GET"])
         def dashboard_user():
-            current_user = get_current_user()
-            return render_template("pengguna.html", current_user=current_user)
-        @app.route("/admin/dashboard/pengaturan", methods=["GET"])
+            user = get_current_user()
+            sidebar_items = DASHBOARD_UI_LIST[user["role"]]
+            return render_template("pengguna.html", sidebar_items=sidebar_items)
+
+        @app.route("/pengaturan", methods=["GET"])
         def dashboard_pengaturan():
-            current_user = get_current_user()
-            return render_template("pengaturan.html", current_user=current_user)
+            user = get_current_user()
+            sidebar_items = DASHBOARD_UI_LIST[user["role"]]
+
+            if not current_user.is_authenticated:
+                return render_template("404.html")
+
+            method = PaymentMethodController()
+
+            detail_id = request.args.get("detail")
+            detail = None
+            if detail_id:
+                detail = method.GetDetailPaymentMethod(detail_id)
+
+            return render_template("pengaturan.html", sidebar_items=sidebar_items, methods=method.GetMyPaymentMehtod(), detail=detail)
+
+        # metode pembayaran
+        @app.route('/tambah-metode-pembayaran', methods=["GET"])
+        def tambah_metode_pembayaran():
+            user = get_current_user()
+            sidebar_items = DASHBOARD_UI_LIST[user["role"]]
+
+            if not current_user.is_authenticated:
+                return render_template("404.html")
+
+            return render_template('tambah_metode_pembayaran.html', sidebar_items=sidebar_items, card_type=CARD_TYPE, banks=BANK_LIST)
+
 
         @app.route('/user_tiket', methods=["GET"])
         def user_tiket():
-            return render_template("user_tiket.html")
+            user = get_current_user()
+            sidebar_items = DASHBOARD_UI_LIST[user["role"]]
+            return render_template("user_tiket.html", sidebar_items=sidebar_items)
 
         @app.route('/profile', methods=["GET"])
         def profile():
-            return render_template("profile.html")
+            user = get_current_user()
+            sidebar_items = DASHBOARD_UI_LIST[user["role"]]
+            return render_template("profile.html", sidebar_items=sidebar_items)
+
 
         @app.route('/activity_log', methods=["GET"])
         def activity_log():
@@ -181,6 +226,66 @@ class EventWebsite:
         @app.route("/register", methods=["GET"])
         def register():
             return render_template("register.html")
+
+        @app.route("/laporan", methods=["GET"])
+        def laporan():
+            return render_template("laporan.html")
+
+        @app.route('/event_saya', methods=["GET"])
+        def event_saya():
+            user = get_current_user()
+            sidebar_items = DASHBOARD_UI_LIST[user["role"]]
+            return render_template("my_events.html", sidebar_items=sidebar_items)
+
+        @app.route('/create_event', methods=["GET"])
+        def create_event_view():
+            user = get_current_user()
+            sidebar_items = DASHBOARD_UI_LIST[user["role"]]
+            return render_template('add_event.html', sidebar_items=sidebar_items)
+
+        @app.route('/history-tiket', methods=["GET"])
+        def history_tiket():
+            user = get_current_user()
+            sidebar_items = DASHBOARD_UI_LIST[user["role"]]
+            return render_template('pesanan.html', sidebar_items=sidebar_items)
+
+        @app.route('/event/detail/<event_id>', methods=["GET"])
+        def event_details(event_id):
+            event = EventController()
+            event_data = event.GetDetails(event_id)
+
+            if event_data == None:
+                return render_template('404.html')
+
+            return render_template('events_detail.html', is_loggedin=current_user.is_authenticated, event=event_data)
+
+        @app.route('/event/book/<event_id>', methods=["GET"])
+        def event_book(event_id):
+            event = EventController()
+            event_data = event.GetDetails(event_id)
+            return render_template('customers_form.html', event=event_data)
+
+        @app.route('/event/pay/<event_id>/<booking_id>', methods=["GET"])
+        def event_payment(event_id, booking_id):
+            event = EventController()
+            event_data = event.GetDetails(event_id)
+            if event_data == None:
+                return render_template('404.html')
+
+            method = PaymentMethodController()
+
+            return render_template('events_booking.html', event=event_data, method=method.GetMyPaymentMehtod())
+
+        @app.route('/payment-success/<payment_id>', methods=["GET"])
+        def payment_success(payment_id):
+            payment_data = PaymentController()
+            if payment_data == None:
+                return render_template('404.html')
+            return render_template('payment-success.html', payment_data=payment_data)
+
+        @app.route('/payment-failed', methods=["GET"])
+        def payment_failure():
+            return render_template('payment-failed.html')
 
 
     def run(self):

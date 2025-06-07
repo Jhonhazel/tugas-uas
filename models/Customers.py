@@ -9,10 +9,10 @@ class Customer(Base):
     id = Column(String(12), primary_key=True)
     first_name = Column(String(255), nullable=False)
     last_name = Column(String(255), nullable=True)
-    phone = Column(String(255), nullable=False, unique=True, index=True)
-    email = Column(String(255), nullable=False, unique=True, index=True)
+    phone = Column(String(255), nullable=False, unique=False, index=True)
+    email = Column(String(255), nullable=False, unique=False, index=True)
     address = Column(String(255), nullable=False)
-    gov_id = Column(String(255), nullable=False, unique=True, index=True)
+    gov_id = Column(String(255), nullable=False, unique=False, index=True)
     created_at = Column(DateTime, default=func.now())
     user_id = Column(String(12), ForeignKey("users.id"), nullable=True)
 

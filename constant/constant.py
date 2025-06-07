@@ -7,12 +7,17 @@ DASHBOARD_UI_LIST = {
     ],
     "organizer": [
         {"icon": "layout-dashboard", "label": "Dashboard", "route": "dashboard"},
-        {"icon": "shopping-cart", "label": "Event Saya", "route": "my_events"},
+        {"icon": "shopping-cart", "label": "Event Saya", "route": "event_saya"},
         {"icon": "bar-chart-3", "label": "Laporan", "route": "laporan"},
     ],
     "user": [
         {"icon": "user-circle", "label": "Profile", "route": "profile"},
         {"icon": "ticket", "label": "Tiket Saya", "route": "user_tiket"},
-        {"icon": "history", "label": "Riwayat", "route": "riwayat_tiket"},
+        {"icon": "history", "label": "Riwayat", "route": "history_tiket"},
+        {"icon": "settings", "label": "Pengaturan", "route": "dashboard_pengaturan"},
     ]
 }
+
+
+BANK_LIST = ['BCA', 'BRI', 'OCBC', 'Mandiri', 'BNI', 'Danamon', 'CIMB Niaga', 'HSBC', 'UOB Indonesia', 'Permata Bank', 'Maybank', 'Citibank', 'BSI']
+CARD_TYPE = ['Mastercard', 'Visa', 'JCB', 'Amex', 'Union-Pay']

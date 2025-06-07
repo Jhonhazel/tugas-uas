@@ -55,34 +55,20 @@ class BookingController(Controller):
             "user_id": user_id
         }
 
-        # Data payment
-        price = event_obj.price
-        tax = 0.12
-        amount = price + (price * tax)
-        payment_data = {
-            "id": generate_random_string(),
-            "method": self.data['method'],
-            "bank_name": self.data['bank_name'],
-            "card_number": self.data['card_number'],
-            "tax": tax,
-            "amount": amount,
-            "user_id": user_id
-        }
-
         # Data booking
         booking_id = generate_random_string()
         booking_data = {
             "id": booking_id,
             "event_id": event_id,
             "customer_id": customer_data['id'],
-            "payment_id": payment_data['id'],
+            "payment_id": None,
             "user_id": user_id,
         }
 
         # Data ticket
         ticket_data = {
             "id": generate_random_string(),
-            "price": price,
+            "price": event_obj.price,
             "booking_id": booking_id,
             "event_id": event_id,
             "user_id": user_id,
@@ -92,11 +78,10 @@ class BookingController(Controller):
             # Buat object SQLAlchemy
             booking = Booking(**booking_data)
             ticket = Ticket(**ticket_data)
-            payment = PaymentInfo(**payment_data)
             customer = Customer(**customer_data)
 
             # Tambahkan ke session
-            self._db.add_all([booking, ticket, payment, customer])
+            self._db.add_all([booking, ticket, customer])
 
             # Update event secara langsung
             event_obj.current_capacity += 1
@@ -109,9 +94,8 @@ class BookingController(Controller):
 
             return jsonify({
                 "msg": "Booking created",
+                "event_id": event_id,
                 "booking_id": booking_id,
-                "payment_id": payment_data['id'],
-                "price": amount
             }), 201
 
         except Exception as e:
@@ -134,9 +118,9 @@ class BookingController(Controller):
         event = self._db.query(Event).filter(Event.id == booking.event_id).first()
 
         # check is time is more than 30 min, than canceled booking automaticly
-        if (has_time_passed(booking.created_at, 1) and payment.status != "SUCCESS"):
-            booking.payment_status = "FAILED"
-            payment.status = "FAILED"
+        if (has_time_passed(booking.created_at, 60) and payment.status != "success"):
+            booking.payment_status = "failed"
+            payment.status = "failed"
             payment.payment_date = datetime.now()
             event.current_capacity -= 1
             event.is_fullybooked = event.current_capacity >= event.capacity
@@ -144,13 +128,13 @@ class BookingController(Controller):
             event.tikets_count -= 1
 
             self._db.commit()
-            return jsonify({"msg": "Payment declined due to timeout"}), 200
+            return jsonify({"msg": "Payment declined due to timeout"}), 400
 
-        if payment.staus == "SUCCESS":
-            return jsonify({"msg": "Already paid"}), 200
+        if payment.status == "success":
+            return jsonify({"msg": "Already paid"}), 400
 
-        booking.payment_status = "SUCCESS"
-        payment.status = "SUCCESS"
+        booking.payment_status = "success"
+        payment.status = "success"
         payment.payment_date = datetime.now()
 
         try:

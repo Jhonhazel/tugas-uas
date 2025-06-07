@@ -2,51 +2,50 @@
 {% block page_title %}Tambah Event{% endblock %}
 
 {% block main_content %}
-<div class="max-w-3xl mx-auto bg-white rounded-lg shadow p-6 text-gray-800">
-    <h2 class="text-2xl font-bold mb-4 text-custom-dark-blue-gray">
-        Tambah Event Baru
-    </h2>
+    <div class="max-w-3xl mx-auto bg-white rounded-lg shadow p-6 text-gray-800">
+        <h2 class="text-2xl font-bold mb-4 text-custom-dark-blue-gray">
+            Tambah Event Baru
+        </h2>
 
-    <form method="POST" action="{{ url_for('add_event') }}">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Nama Event</label>
                 <input type="text" name="name" required
                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                       placeholder="Masukkan nama event">
+                       placeholder="Masukkan nama event" id="name">
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Alamat Venue</label>
                 <input type="text" name="venue_address" required
                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                       placeholder="Alamat lengkap venue">
+                       placeholder="Alamat lengkap venue" id="venue_address">
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai</label>
                 <input type="datetime-local" name="started_at" required
-                       class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                       class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="started_at">
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Selesai</label>
                 <input type="datetime-local" name="ended_at" required
-                       class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                       class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" id="ended_at">
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Harga Tiket (Rp)</label>
                 <input type="number" name="price" required step="1000"
                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                       placeholder="Contoh: 50000">
+                       placeholder="Contoh: 50000" id="price">
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Kapasitas</label>
                 <input type="number" name="capacity" required
                        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                       placeholder="Jumlah total tiket tersedia">
+                       placeholder="Jumlah total tiket tersedia" id="capacity">
             </div>
         </div>
 
@@ -54,19 +53,18 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi Event</label>
             <textarea name="description" rows="4" required
                       class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Tulis deskripsi singkat mengenai event..."></textarea>
+                      placeholder="Tulis deskripsi singkat mengenai event..." id="description"></textarea>
         </div>
 
         <div class="mt-6 flex justify-end space-x-3">
-            <a href="{{ url_for('my_events') }}"
+            <a href="/event_saya"
                class="px-4 py-2 border border-gray-400 text-gray-600 rounded hover:bg-gray-100">
                 Batal
             </a>
-            <button type="submit"
+            <button id="create"
                     class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
                 Simpan Event
             </button>
         </div>
-    </form>
-</div>
+    </div>
 {% endblock %}

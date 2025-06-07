@@ -34,13 +34,12 @@ class PaymentController(Controller):
 
         data = model_to_dict(payment)
 
-        return jsonify({
-            "id": payment.id,
-            "status": payment.status.value,
-        }), 200
+        return data
 
     def CreatePayment(self):
         booking_id = self.data['booking_id']
+        payment_id = generate_random_string()
+        payment_method_id = self.data['payment_method_id']
         user_id = current_user.id
 
         booking = self._db.query(Booking).filter(Booking.id == booking_id).first()
@@ -54,24 +53,19 @@ class PaymentController(Controller):
             return jsonify({"msg": "Already paid"}), 200
 
         payment_data = {
-            "id": generate_random_string(),
-            "method": self.data['method'],
-            "bank_name": self.data['bank_name'],
-            "card_number": self.data['card_number'],
-            "status": "SUCCESS",
+            "id": payment_id,
+            "payment_method_id": payment_method_id,
             "tax": 0.12,
             "amount": ticket.price + (ticket.price * 0.12),
             "payment_date": datetime.now(),
             "user_id": user_id,
         }
 
+        print(payment_data)
+
         try:
             payment = PaymentInfo(**payment_data)
-            booking.payment_status = "SUCCESS"
-            event.current_capacity += 1
-            event.is_fullybooked = event.current_capacity >= event.capacity
-            event.is_available = not event.is_fullybooked
-            event.tikets_count += 1
+            booking.payment_id = payment_id
 
             self._db.add(payment)
             self._db.commit()
@@ -82,6 +76,8 @@ class PaymentController(Controller):
 
             return jsonify({
                 "msg": "Payment successful",
+                "payment_id": payment_id,
+                "booking_id": booking_id
             }), 200
 
         except Exception as e:

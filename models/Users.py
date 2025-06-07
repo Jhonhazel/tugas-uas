@@ -26,6 +26,7 @@ class User(Base, UserMixin):
     bookings = relationship("Booking", back_populates="user")
     tickets = relationship("Ticket", back_populates="user")
     payment_infos = relationship("PaymentInfo", back_populates="user")
+    payment_methods = relationship("PaymentMethod", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<User(id={self.id}, username='{self.username}')>"

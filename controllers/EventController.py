@@ -4,7 +4,7 @@ from lib.model_to_dicts import model_to_dict
 from models.Events import Event
 from lib.string_func import generate_random_string
 from controllers.Controllers import Controller
-from flask import jsonify, request
+from flask import jsonify, request, render_template
 
 from models.Users import User
 
@@ -48,4 +48,8 @@ class EventController(Controller):
         return jsonify({ "data": [model_to_dict(e) for e in event] })
 
     def GetDetails(self, event_id):
-        pass
+        event = self._db.query(Event).filter(Event.id == event_id).first()
+        if not event:
+            return None
+
+        return model_to_dict(event)

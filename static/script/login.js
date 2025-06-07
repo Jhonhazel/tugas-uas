@@ -31,7 +31,7 @@ loginBtn.addEventListener("click", async () => {
         if (data.role === "user") {
             window.location.replace("/")
         } else {
-            window.location.replace('/dashboard')
+            window.location.replace('/admin/dashboard')
         }
 
     } catch (error) {

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{{ event.name }} | Tiketen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2575fc',
+                        secondary: '#6a11cb',
+                    }
+                }
+            }
+        }
+    </script>
+    {{ moment.include_moment() }}
+</head>
+<body class="bg-gray-50 text-gray-800">
+<header class="bg-primary text-white py-6 shadow">
+    <div class="max-w-6xl mx-auto px-4">
+        <h1 class="text-3xl font-bold">{{ event.name }}</h1>
+        <p class="text-blue-100">{{ event.venue_address }} - {{ moment(event.started_at).format('LL, HH:mm') }}</p>
+    </div>
+</header>
+
+<main class="py-10">
+    <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-3 gap-8">
+        <div class="md:col-span-2">
+            <img src="/placeholder.svg?height=300&width=600" alt="Event image"
+                 class="rounded-xl shadow mb-6 w-full h-auto"/>
+            <h2 class="text-2xl font-semibold mb-4">Deskripsi</h2>
+            <p class="text-gray-700 leading-relaxed">{{ event.description }}</p>
+        </div>
+
+        <aside class="bg-white shadow rounded-xl p-6">
+            <h3 class="text-lg font-semibold mb-4">Informasi Event</h3>
+            <ul class="space-y-2 text-sm">
+                <li><strong>Harga Tiket:</strong> Rp {{ '{:,.0f}'.format(event.price) }}</li>
+                <li><strong>Kapasitas:</strong> {{ event.capacity }} orang</li>
+                <li><strong>Terisi:</strong> {{ event.current_capacity }} orang</li>
+                <li><strong>Sisa Tiket:</strong> {{ event.capacity - event.current_capacity }}</li>
+                <li><strong>Status:</strong>
+                    {% if event.is_fullybooked %}
+                        <span class="text-red-600 font-semibold">Penuh</span>
+                    {% else %}
+                        <span class="text-green-600 font-semibold">Tersedia</span>
+                    {% endif %}
+                </li>
+            </ul>
+
+            <div class="mt-6">
+                {% if not is_loggedin %}
+                    <a href="/register"
+                       class="block w-full bg-primary text-white text-center py-3 rounded-lg hover:bg-blue-600 transition font-semibold">
+                        Daftar Sekarang
+                    </a>
+                {% elif not event.is_fullybooked %}
+                    <a href="/event/book/{{ event.id }}"
+                       class="block w-full bg-primary text-white text-center py-3 rounded-lg hover:bg-blue-600 transition font-semibold">
+                        Pesan Tiket Sekarang
+                    </a>
+                {% else %}
+                    <p class="text-red-500 font-semibold text-center">
+                        Tiket Sudah Habis
+                    </p>
+                {% endif %}
+            </div>
+
+
+        </aside>
+    </div>
+</main>
+
+<footer class="bg-gray-900 text-white py-6 mt-12">
+    <div class="text-center text-gray-400 text-sm">
+        &copy; 2024 Tiketen. All rights reserved.
+    </div>
+</footer>
+</body>
+</html>
