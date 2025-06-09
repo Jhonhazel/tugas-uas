@@ -1,0 +1,42 @@
+{% extends "dashboard.html" %}
+
+{% block main_content %}
+<div class="max-w-5xl mx-auto bg-white rounded-lg shadow p-6 text-gray-800">
+    <div class="flex items-center space-x-6 mb-8">
+        <img class="w-20 h-20 rounded-full border-4 border-blue-500 object-cover" 
+             src="https://placehold.co/80x80/FFFFFF/3B82F6?text={{ current_user.username[0] | upper }}" 
+             alt="Avatar">
+        <div>
+            <h2 class="text-2xl font-bold text-custom-dark-blue-gray">{{ current_user.username }}</h2>
+            <p class="text-gray-500">{{ current_user.email }}</p>
+        </div>
+    </div>
+
+    <h3 class="text-xl font-semibold text-custom-dark-blue-gray mb-4">Daftar Tiket</h3>
+
+    <div id="booking-list">
+        {% if bookings %}
+            {% for booking in bookings %}
+                <div class="border border-gray-200 rounded-lg p-4 mb-4 shadow-sm">
+                    <div class="flex justify-between items-center">
+                      <div>
+                        <p class="font-semibold text-gray-700">#{{ loop.index }} - {{ booking.customer.first_name }} {{ booking.customer.last_name }}</p>
+                        <p class="text-sm text-gray-500">Event ID: {{ booking.booking.event_id }}</p>
+                        <p class="text-sm text-gray-500">Status Pembayaran: 
+                            <span class="font-medium {{ 'text-green-600' if booking.booking.payment_status == 'success' else 'text-red-600' }}">
+                                {{ booking.booking.payment_status }}
+                            </span>
+                        </p>
+                    </div>                    
+                        <div class="text-sm text-gray-400 text-right">
+                            {{ moment(booking.booking.created_at).format('LL, HH:mm') }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-gray-500">Tidak ada tiket yang ditemukan.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Pesan Tiket - {{ event.name }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2575fc',
+                        secondary: '#6a11cb',
+                    }
+                }
+            }
+        }
+    </script>
+    {{ moment.include_moment() }}
+</head>
+<body class="bg-gray-50 text-gray-800">
+<header class="bg-primary text-white py-6 shadow">
+    <div class="max-w-6xl mx-auto px-4">
+        <h1 class="text-3xl font-bold">Pesan Tiket: {{ event.name }}</h1>
+        <p class="text-blue-100">{{ event.venue_address }} - {{ moment(event.started_at).format('LL, HH:mm') }}</p>
+    </div>
+</header>
+
+<main class="p-10">
+    <div class="max-w-3xl mx-auto px-10 bg-white p-8 rounded-xl shadow">
+        <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50"
+             role="alert">
+            <span class="font-medium">Perhatian!</span>
+            <span id="countdown-timer" class="ml-2 font-mono"></span>
+        </div>
+        <!-- Payment Info -->
+        <h2 class="text-xl font-semibold mb-4">Pembayaran</h2>
+        <div class="mb-6 space-y-6">
+            <h1 class="font-bold">Kartu Debit/Kredit</h1>
+            {% if not method %}
+                <span>Kamu tidak memiliki metode pembayaran.</span>
+            {% endif %}
+            <ul class="space-y-2 w-full">
+                {% for m in method %}
+                    <li>
+                        <input type="radio" id="{{ m.id }}" name="payment_method" value="{{ m.id }}"
+                               class="hidden peer">
+                        <label for="{{ m.id }}"
+                               class="inline-flex items-center justify-between w-full px-5 h-[50px] text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100">
+                            <img src="/static/img/bank/{{ m.bank_name | lower }}.svg" class="w-[30px]"/>
+                            <div class="flex items-center space-x-4">
+                                <img src="/static/img/card/{{ m.card_type | lower }}.svg" class="w-[30px]"/>
+                                <span class="text-sm font-bold">{{ m.card_number }}</span>
+                            </div>
+                        </label>
+                    </li>
+                {% endfor %}
+            </ul>
+
+        </div>
+
+        <!-- Summary -->
+        <div class="bg-gray-100 p-4 rounded-md mb-6">
+            <p class="text-sm text-gray-700">Harga Tiket: <strong>Rp {{ '{:,.0f}'.format(event.price) }}</strong></p>
+            <p class="text-sm text-gray-700">Pajak (12%): <strong>Rp {{ '{:,.0f}'.format(event.price * 0.12) }}</strong>
+            </p>
+            <p class="text-md font-semibold mt-2">Total Bayar: <span
+                    class="text-primary">Rp {{ '{:,.0f}'.format((event.price * 0.12) + event.price) }}</span></p>
+        </div>
+
+        <!-- Submit -->
+        <button id="pay"
+                class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition">
+            Konfirmasi & Pesan Tiket
+        </button>
+    </div>
+</main>
+
+<footer>
+    <div class="text-center text-gray-400 text-sm">
+        &copy; 2024 Tiketen. All rights reserved.
+    </div>
+</footer>
+</body>
+<script src="/static/script/events_booking.js" defer></script>
+</html>

@@ -1,0 +1,51 @@
+{% extends "dashboard.html" %}
+{% block page_title %}Pesanan Tiket{% endblock %}
+
+{% block main_content %}
+<div class="max-w-6xl mx-auto bg-white rounded-lg shadow p-6 text-gray-800">
+    <h2 class="text-2xl font-bold text-custom-dark-blue-gray mb-6">Riwayat Pesanan Tiket</h2>
+
+    {% if bookings %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-200 text-sm">
+                <thead class="bg-gray-100 text-gray-700 uppercase text-xs tracking-wider">
+                    <tr>
+                        <th class="px-4 py-3 text-left border-b">#</th>
+                        <th class="px-4 py-3 text-left border-b">Event</th>
+                        <th class="px-4 py-3 text-left border-b">Status</th>
+                        <th class="px-4 py-3 text-left border-b">Tanggal</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                    {% for booking in bookings %}
+                        <tr class="hover:bg-slate-50">
+                            <td class="px-4 py-2 border-b">{{ loop.index }}</td>
+                            <td class="px-4 py-2 border-b">{{ booking.event.name }}</td>
+                            <td class="px-4 py-2 border-b">
+                                {% if booking.payment_status.value == 'SUCCESS' %}
+                                    <span class="px-2 py-1 text-green-600 bg-green-100 rounded text-xs font-medium">Lunas</span>
+                                {% elif booking.payment_status.value == 'PENDING' %}
+                                    <span class="px-2 py-1 text-yellow-600 bg-yellow-100 rounded text-xs font-medium">Menunggu</span>
+                                {% elif booking.payment_status.value == 'FAILED' %}
+                                    <span class="px-2 py-1 text-red-600 bg-red-100 rounded text-xs font-medium">Gagal</span>
+                                {% else %}
+                                    <span class="px-2 py-1 text-gray-600 bg-gray-100 rounded text-xs font-medium">{{ booking.payment_status.value | capitalize }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-2 border-b">{{ booking.created_at.strftime("%d %b %Y %H:%M") }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-gray-500">Belum ada pesanan yang tercatat.</p>
+    {% endif %}
+
+    <div class="mt-6">
+        <a href="{{ url_for('dashboard_view') }}" class="text-blue-600 hover:underline text-sm">
+            &larr; Kembali ke Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

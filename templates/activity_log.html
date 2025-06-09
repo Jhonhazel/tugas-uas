@@ -1,0 +1,47 @@
+{% extends "dashboard.html" %}
+{% block page_title %}Activity Log{% endblock %}
+
+{% block main_content %}
+<div class="max-w-6xl mx-auto bg-white rounded-lg shadow p-6 text-gray-800">
+    <h2 class="text-2xl font-bold text-custom-dark-blue-gray mb-6">Riwayat Aktivitas Pengguna</h2>
+
+    {% if login_history %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-200 text-sm">
+                <thead class="bg-gray-100 text-gray-700 uppercase text-xs tracking-wider">
+                    <tr>
+                        <th class="px-4 py-3 text-left border-b">#</th>
+                        <th class="px-4 py-3 text-left border-b">User ID</th>
+                        <th class="px-4 py-3 text-left border-b">Device ID</th>
+                        <th class="px-4 py-3 text-left border-b">Logout</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                    {% for log in login_history %}
+                        <tr class="hover:bg-slate-50">
+                            <td class="px-4 py-2 border-b">{{ loop.index }}</td>
+                            <td class="px-4 py-2 border-b">{{ log.user_id }}</td>
+                            <td class="px-4 py-2 border-b">{{ log.device_id or 'Tidak Diketahui' }}</td>
+                            <td class="px-4 py-2 border-b">
+                                {% if log.logout_date %}
+                                    {{ log.logout_date.strftime('%d %B %Y %H:%M') }}
+                                {% else %}
+                                    <span class="text-yellow-600 font-medium">Belum Logout</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-gray-500">Belum ada aktivitas login yang tercatat.</p>
+    {% endif %}
+
+    <div class="mt-6">
+        <a href="{{ url_for('index') }}" class="text-blue-600 hover:underline text-sm">
+            &larr; Kembali ke Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

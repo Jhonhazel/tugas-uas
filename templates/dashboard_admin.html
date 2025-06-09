@@ -1,0 +1,28 @@
+{% extends "dashboard.html" %}
+
+{% block page_title %}Dashboard Admin{% endblock %}
+
+{% block main_content %}
+<div class="max-w-6xl mx-auto bg-white rounded-lg shadow p-6 text-gray-800">
+    <h2 class="text-2xl font-bold text-custom-dark-blue-gray mb-6">Selamat datang, Admin!</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-blue-100 p-4 rounded shadow text-center">
+            <h3 class="text-xl font-semibold">👤 Pengguna</h3>
+            <p class="text-3xl font-bold mt-2">{{ total_users }}</p>
+        </div>
+        <div class="bg-green-100 p-4 rounded shadow text-center">
+            <h3 class="text-xl font-semibold">🎫 Event</h3>
+            <p class="text-3xl font-bold mt-2">{{ total_events }}</p>
+        </div>
+        <div class="bg-yellow-100 p-4 rounded shadow text-center">
+            <h3 class="text-xl font-semibold">🧾 Tiket Terjual</h3>
+            <p class="text-3xl font-bold mt-2">{{ total_tickets_sold }}</p>
+        </div>
+    </div>
+
+    <div class="mt-6 text-sm text-gray-500">
+        Data diperbarui secara berkala.
+    </div>
+</div>
+{% endblock %}
