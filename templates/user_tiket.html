@@ -1,5 +1,4 @@
 {% extends "dashboard.html" %}
-{% block page_title %}Tiket Saya{% endblock %}
 
 {% block main_content %}
 <div class="max-w-5xl mx-auto bg-white rounded-lg shadow p-6 text-gray-800">
@@ -16,11 +15,28 @@
     <h3 class="text-xl font-semibold text-custom-dark-blue-gray mb-4">Daftar Tiket</h3>
 
     <div id="booking-list">
-        <p class="text-gray-400">Memuat data tiket...</p>
+        {% if bookings %}
+            {% for booking in bookings %}
+                <div class="border border-gray-200 rounded-lg p-4 mb-4 shadow-sm">
+                    <div class="flex justify-between items-center">
+                      <div>
+                        <p class="font-semibold text-gray-700">#{{ loop.index }} - {{ booking.customer.first_name }} {{ booking.customer.last_name }}</p>
+                        <p class="text-sm text-gray-500">Event ID: {{ booking.booking.event_id }}</p>
+                        <p class="text-sm text-gray-500">Status Pembayaran: 
+                            <span class="font-medium {{ 'text-green-600' if booking.booking.payment_status == 'success' else 'text-red-600' }}">
+                                {{ booking.booking.payment_status }}
+                            </span>
+                        </p>
+                    </div>                    
+                        <div class="text-sm text-gray-400 text-right">
+                            {{ moment(booking.booking.created_at).format('LL, HH:mm') }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-gray-500">Tidak ada tiket yang ditemukan.</p>
+        {% endif %}
     </div>
 </div>
-
-<!-- Hubungkan file JS eksternal -->
-<script src="{{ url_for('static', filename='js/user_tiket.js') }}" defer></script>
 {% endblock %}
-

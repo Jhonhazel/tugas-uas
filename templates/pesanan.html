@@ -12,7 +12,6 @@
                     <tr>
                         <th class="px-4 py-3 text-left border-b">#</th>
                         <th class="px-4 py-3 text-left border-b">Event</th>
-                        <th class="px-4 py-3 text-left border-b">Metode Pembayaran</th>
                         <th class="px-4 py-3 text-left border-b">Status</th>
                         <th class="px-4 py-3 text-left border-b">Tanggal</th>
                     </tr>
@@ -21,18 +20,19 @@
                     {% for booking in bookings %}
                         <tr class="hover:bg-slate-50">
                             <td class="px-4 py-2 border-b">{{ loop.index }}</td>
-                            <td class="px-4 py-2 border-b">{{ booking.event_name }}</td>
-                            <td class="px-4 py-2 border-b">{{ booking.payment_method | title }}</td>
+                            <td class="px-4 py-2 border-b">{{ booking.event.name }}</td>
                             <td class="px-4 py-2 border-b">
-                                {% if booking.payment_status == 'paid' %}
+                                {% if booking.payment_status.value == 'SUCCESS' %}
                                     <span class="px-2 py-1 text-green-600 bg-green-100 rounded text-xs font-medium">Lunas</span>
-                                {% elif booking.payment_status == 'pending' %}
+                                {% elif booking.payment_status.value == 'PENDING' %}
                                     <span class="px-2 py-1 text-yellow-600 bg-yellow-100 rounded text-xs font-medium">Menunggu</span>
+                                {% elif booking.payment_status.value == 'FAILED' %}
+                                    <span class="px-2 py-1 text-red-600 bg-red-100 rounded text-xs font-medium">Gagal</span>
                                 {% else %}
-                                    <span class="px-2 py-1 text-red-600 bg-red-100 rounded text-xs font-medium">{{ booking.payment_status | capitalize }}</span>
+                                    <span class="px-2 py-1 text-gray-600 bg-gray-100 rounded text-xs font-medium">{{ booking.payment_status.value | capitalize }}</span>
                                 {% endif %}
                             </td>
-                            <td class="px-4 py-2 border-b">{{ booking.createdAt.strftime('%d %B %Y %H:%M') }}</td>
+                            <td class="px-4 py-2 border-b">{{ booking.created_at.strftime("%d %b %Y %H:%M") }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -43,7 +43,7 @@
     {% endif %}
 
     <div class="mt-6">
-        <a href="{{ url_for('index') }}" class="text-blue-600 hover:underline text-sm">
+        <a href="{{ url_for('dashboard_view') }}" class="text-blue-600 hover:underline text-sm">
             &larr; Kembali ke Dashboard
         </a>
     </div>

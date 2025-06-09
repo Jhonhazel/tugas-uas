@@ -20,7 +20,6 @@
             <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Started At</th>
             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ended At</th>
-            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor ID</th>
             <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Fully Booked</th>
             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Venue Address</th>
           </tr>
@@ -33,11 +32,10 @@
             <td class="px-4 py-2 max-w-xs truncate">{{ event.description }}</td>
             <td class="px-4 py-2 text-right">{{ event.capacity }}</td>
             <td class="px-4 py-2 text-right">{{ event.current_capacity }}</td>
-            <td class="px-4 py-2 text-right">{{ event.tickets_count }}</td>
-            <td class="px-4 py-2 text-right">${{ "%.2f"|format(event.price) }}</td>
-            <td class="px-4 py-2">{{ event.startedAt }}</td>
-            <td class="px-4 py-2">{{ event.endedAt }}</td>
-            <td class="px-4 py-2">{{ event.vendors_id }}</td>
+            <td class="px-4 py-2 text-right">{{ event.tikets_count }}</td>
+            <td class="px-4 py-2 text-right">Rp.{{ "%.2f"|format(event.price) }}</td>
+            <td class="px-4 py-2">{{ event.started_at }}</td>
+            <td class="px-4 py-2">{{ event.ended_at }}</td>
             <td class="px-4 py-2 text-center">
               {% if event.is_fullybooked %}
                 <span class="text-red-600 font-semibold">Yes</span>
@@ -45,7 +43,7 @@
                 <span class="text-green-600 font-semibold">No</span>
               {% endif %}
             </td>
-            <td class="px-4 py-2 max-w-xs truncate">{{ event.venue_adress }}</td>
+            <td class="px-4 py-2 max-w-xs truncate">{{ event.venue_address }}</td>
           </tr>
           {% else %}
           <tr>
@@ -68,37 +66,33 @@
             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer ID</th>
             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event ID</th>
-            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ticket ID</th>
             <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Status</th>
-            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
             <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment ID</th>
-            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fullname</th>
+            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">First Name</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
-          {% for booking in bookings %}
+          {% for booking, customer in bookings %}
           <tr class="hover:bg-gray-50">
             <td class="px-4 py-2 whitespace-nowrap">{{ booking.id }}</td>
             <td class="px-4 py-2 whitespace-nowrap">{{ booking.customer_id }}</td>
-            <td class="px-4 py-2">{{ booking.phone }}</td>
+            <td class="px-4 py-2">{{ customer.phone }}</td>
             <td class="px-4 py-2 whitespace-nowrap">{{ booking.event_id }}</td>
-            <td class="px-4 py-2 whitespace-nowrap">{{ booking.ticket_id }}</td>
             <td class="px-4 py-2 text-center">
-              {% if booking.payment_status == 'paid' %}
+              {% if booking.payment_status.value == 'success' %}
                 <span class="text-green-600 font-semibold">Paid</span>
-              {% elif booking.payment_status == 'pending' %}
+              {% elif booking.payment_status.value == 'pending' %}
                 <span class="text-yellow-600 font-semibold">Pending</span>
               {% else %}
                 <span class="text-red-600 font-semibold">Failed</span>
               {% endif %}
             </td>
-            <td class="px-4 py-2">{{ booking.payment_method }}</td>
-            <td class="px-4 py-2 whitespace-nowrap">{{ booking.createdAt }}</td>
+            <td class="px-4 py-2 whitespace-nowrap">{{ booking.created_at }}</td>
             <td class="px-4 py-2 whitespace-nowrap">{{ booking.user_id }}</td>
             <td class="px-4 py-2 whitespace-nowrap">{{ booking.payment_id }}</td>
-            <td class="px-4 py-2">{{ booking.fullname }}</td>
+            <td class="px-4 py-2">{{ customer.first_name }}</td>
           </tr>
           {% else %}
           <tr>
@@ -109,6 +103,7 @@
       </table>
     </div>
   </section>
+  
 
   <!-- Payment Info Table -->
   <section>
@@ -136,18 +131,18 @@
             <td class="px-4 py-2">{{ payment.bank_name }}</td>
             <td class="px-4 py-2">{{ payment.card_number }}</td>
             <td class="px-4 py-2 text-center">
-              {% if payment.status == 'completed' %}
+              {% if payment.status.value == 'success' %}
                 <span class="text-green-600 font-semibold">Completed</span>
-              {% elif payment.status == 'pending' %}
+              {% elif payment.status.value == 'pending' %}
                 <span class="text-yellow-600 font-semibold">Pending</span>
               {% else %}
                 <span class="text-red-600 font-semibold">Failed</span>
               {% endif %}
             </td>
-            <td class="px-4 py-2 text-right">${{ "%.2f"|format(payment.amount) }}</td>
+            <td class="px-4 py-2 text-right">Rp.{{ "%.2f"|format(payment.amount) }}</td>
             <td class="px-4 py-2 whitespace-nowrap">{{ payment.payment_date }}</td>
             <td class="px-4 py-2 whitespace-nowrap">{{ payment.user_id }}</td>
-            <td class="px-4 py-2 text-right">{{ payment.tax }}%</td>
+            <td class="px-4 py-2 text-right">{{ payment.tax }}</td>
           </tr>
           {% else %}
           <tr>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Detail Kartu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="w-full h-screen flex items-center justify-center">
+<div class="w-[540px] p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8">
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="font-bold text-xl">Detail Kartu</h1>
+        <a href="/pengaturan" class="text-sm hover:underline">Kembali</a>
+    </div>
+    <div class="w-[350px] h-[200px] bg-[url('/static/img/card/bg/card-{{ details.card_type }}.png')] rounded-lg overflow-hidden relative select-none text-white">
+        <span class="absolute font-mono bottom-[80px] left-[18px]">{{ details.card_number }}</span>
+        <div class="absolute bottom-[45px] left-[18px] text-[9px]">
+            <span class="block">Valid till</span>
+            <span class="font-bold">{{ details.expired_month }}/{{ details.expired_year }}</span>
+        </div>
+        <span class="absolute bottom-[20px] left-[18px] text-xs uppercase font-bold font-mono">{{ details.placeholder_name }}</span>
+    </div>
+
+    <button class="w-full focus:outline-none text-red-700 bg-white hover:text-white hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 mt-8">Hapus Kartu</button>
+</div>
+
+</body>
+</html>

@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, Integer, Float, Boolean, DateTime, ForeignKey, func
 from sqlalchemy.orm import relationship
 
-from db.base import Base
+from db.db import Base
 
 class Event(Base):
     __tablename__ = 'events'
@@ -15,17 +15,16 @@ class Event(Base):
     started_at = Column(DateTime, nullable=False)
     ended_at = Column(DateTime, nullable=False)
     price = Column(Float, nullable=False)
-
     venue_address = Column(String(255), nullable=False)
     is_fullybooked = Column(Boolean, nullable=False, default=False)
 
-    vendor_id = Column(String(255), ForeignKey("vendors.id"), nullable=False, name="vendors_id")
+    user_id = Column(String(12), ForeignKey("users.id"), nullable=True)
+    user = relationship("User", back_populates="events")
 
-    vendor = relationship("Vendor", back_populates="events")
     bookings = relationship("Booking", back_populates="event")
     tickets = relationship("Ticket", back_populates="event")
 
+    created_at = Column(DateTime, default=func.now())
+
     def __repr__(self):
         return f"<Event(id={self.id}, name='{self.name}')>"
-
-    created_at = Column(DateTime, default=func.now())

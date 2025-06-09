@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Tambah Metode Pembayaran</title>
+</head>
+<body class="w-full h-screen flex items-center justify-center">
+<div class="max-w-3xl mx-auto bg-white rounded-lg shadow p-6 text-gray-800">
+    <h2 class="text-3xl font-bold text-custom-dark-blue-gray mb-6">Tambah Metode Pembayaran</h2>
+
+    <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50"
+         role="alert">
+        <span class="font-bold">Kartu kamu aman!</span> Kami telah memastikan informasi sensitif tentang kartu mu
+        tetap terlindungi.
+    </div>
+    <div class="space-y-6 text-sm mt-4">
+        <div class="flex items-center justify-between">
+            <p class="font-bold">Rincian Kartu</p>
+            <div class="grid grid-cols-5 items-center gap-2">
+                {% for card in card_type %}
+                    <img src="/static/img/card/{{ card.lower() }}.svg" class="w-[30px] h-max"/>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="grid grid-cols-3 gap-5">
+            <div class="col-span-2">
+                <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900">Nomor Kartu</label>
+                <div class="relative flex items-center w-full justify-between">
+                    <input type="text"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                           placeholder="4111 **** **** ***" required autocomplete="off" id="card-number"/>
+                    <img src="" id="card-logo" class="w-5 absolute right-[30px]"/>
+                </div>
+            </div>
+            <div>
+                <label for="countries" class="block mb-2 text-sm font-medium text-gray-900 ">Pilih Bank</label>
+                <select class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" id="bank-name">
+                    <option value="">Pilih Bank</option>
+                    {% for bank in banks %}
+                        <option value="{{ bank }}">{{ bank }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="grid grid-cols-3 gap-5">
+            <div class="col-span-2">
+                <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900">Tanggal Kadarluarsa
+                    (BB/TT)</label>
+                <input type="text"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                       placeholder="" required autocomplete="off" id="expired-date" maxlength="5"/>
+            </div>
+            <div class="col-span-1">
+                <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900">CVV / CVC</label>
+                <input type="text"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                       placeholder="" required autocomplete="off" id="cvv-cvc" maxlength="3"/>
+            </div>
+        </div>
+        <div class="mt-5">
+            <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900">Nama di kartu</label>
+            <input type="text"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                   placeholder="" required autocomplete="off" id="placeholder-name"/>
+        </div>
+        <div class="grid grid-cols-2 gap-5 w-1/2">
+            <button class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
+                    id="tambah">Tambah
+            </button>
+            <a href="/pengaturan"
+               class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 text-center">Nanti</a>
+        </div>
+    </div>
+</div>
+</body>
+<script src="{{ url_for('static', filename='script/metode_pembayaran.js') }}" defer></script>
+
+</html>

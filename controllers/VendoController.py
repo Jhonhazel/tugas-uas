@@ -1,3 +1,5 @@
+from flask_login import current_user
+
 from lib.model_to_dicts import model_to_dict
 from models.Vendors import Vendor
 from lib.string_func import generate_random_string

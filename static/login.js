@@ -26,7 +26,7 @@ loginBtn.addEventListener("click", async () => {
             console.log(await res.json())
             return alert("Terjadi kesalahan saat login!")
         }
-        window.location.replace('/')
+        window.location.replace('/dashboard')
     } catch (error) {
         console.log(error)
     }

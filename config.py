@@ -1,3 +1,0 @@
-APP_NAME = "Tiketen"
-MAINTENANCE_MODE = False
-DEFAULT_ROLE = "user"

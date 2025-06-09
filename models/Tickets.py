@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, Float, DateTime, ForeignKey, func
 from sqlalchemy.orm import relationship
 
-from db.base import Base
+from db.db import Base
 
 class Ticket(Base):
     __tablename__ = 'tickets'
@@ -11,9 +11,11 @@ class Ticket(Base):
 
     booking_id = Column(String(12), ForeignKey("bookings.id"), nullable=False)
     event_id = Column(String(12), ForeignKey("events.id"), nullable=False)
+    user_id = Column(String(12), ForeignKey("users.id"), nullable=True)
 
     booking = relationship("Booking", back_populates="tickets")
     event = relationship("Event", back_populates="tickets")
+    user = relationship("User", back_populates="tickets")
 
     def __repr__(self):
         return f"<Ticket(id={self.id}, price={self.price}, booking_id='{self.booking_id}')>"

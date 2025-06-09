@@ -4,14 +4,22 @@ from lib.model_to_dicts import model_to_dict
 from models.Events import Event
 from lib.string_func import generate_random_string
 from controllers.Controllers import Controller
-from flask import jsonify, request
+from flask import jsonify, request, render_template
 
+from models.Users import User
 
 class EventController(Controller):
     def __init__(self):
         super().__init__()
 
     def CreateEvent(self):
+        user_id = current_user.id
+
+        user = self._db.query(User).filter(User.id == user_id).first()
+
+        if user.role.value != "organizer":
+            return jsonify({"msg": "Unauthorized user"}), 403
+
         data = {
             "id": generate_random_string(),
             "name": self.data['name'],
@@ -21,7 +29,6 @@ class EventController(Controller):
             "started_at": self.data['started_at'],
             "ended_at": self.data['ended_at'],
             "venue_address": self.data['venue_address'],
-            "vendor_id": self.data['vendor_id']
         }
 
         event = Event(**data)
@@ -33,22 +40,16 @@ class EventController(Controller):
         return jsonify({ "msg": "event created", "id": data["id"] }), 201
 
     def GetAll(self):
-        event_id = request.args.get('id')
+        event = self._db.query(Event).all()
 
-        if event_id is not None:
-            event = self._db.query(Event).filter(Event.id == event_id).first()
+        if not event:
+            return jsonify({"data": []}), 200
 
-            if not event:
-                return jsonify({"msg": "Event not found"}), 404
+        return jsonify({ "data": [model_to_dict(e) for e in event] })
 
-            return jsonify({
-                "data": event,
-                "code": 200
-            }), 200
+    def GetDetails(self, event_id):
+        event = self._db.query(Event).filter(Event.id == event_id).first()
+        if not event:
+            return None
 
-        events = self._db.query(Event).all()
-        event_data = [model_to_dict(e) for e in events]
-        return jsonify({
-                "data": event_data,
-                "code": 200
-            }), 200
+        return model_to_dict(event)

@@ -1,41 +1,57 @@
 {% extends "dashboard.html" %}
-{% block page_title %}Pengaturan Sistem{% endblock %}
+{% block page_title %}Pengaturan Akun{% endblock %}
 
 {% block main_content %}
-<div class="max-w-3xl mx-auto bg-white rounded-lg shadow p-6 text-gray-800">
-    <h2 class="text-2xl font-bold text-custom-dark-blue-gray mb-6">Pengaturan Sistem (Read-Only)</h2>
+    <div class="max-w-3xl mx-auto bg-white rounded-lg shadow p-6 text-gray-800 h-screen overflow-y-auto">
+        <h2 class="text-3xl font-bold text-custom-dark-blue-gray mb-6">Pengaturan Akun</h2>
 
-    <div class="space-y-6 text-sm">
-        <!-- Nama Aplikasi -->
-        <div>
-            <label class="block font-semibold mb-1">Nama Aplikasi</label>
-            <p class="border px-3 py-2 rounded bg-gray-50">{{ pengaturan.app_name }}</p>
-        </div>
-
-        <!-- Mode Pemeliharaan -->
-        <div>
-            <label class="block font-semibold mb-1">Mode Pemeliharaan</label>
-            <div class="flex items-center space-x-2">
-                {% if pengaturan.maintenance_mode %}
-                    <span class="text-green-600 font-medium">Aktif</span>
-                {% else %}
-                    <span class="text-gray-500">Nonaktif</span>
-                {% endif %}
+        <div class="space-y-6 text-sm">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-bold">Kartu Pembayaran</h3>
+                <a href="/tambah-metode-pembayaran"
+                   class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">Tambah
+                    Metode Pembayaran</a>
             </div>
-            <p class="text-xs text-gray-500 mt-1">Mode ini akan menampilkan halaman pemeliharaan jika aktif.</p>
-        </div>
+            {% if not methods %}
+                <div class="w-full text-center">
+                    <span class="text-center">Kamu tidak memiliki metode pembayaran</span>
+                </div>
+            {% endif %}
+            <div class="grid grid-cols-1 space-y-5">
+                {% for method in methods %}
+                    <div class="space-y-5">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-6">
+                                <img src="/static/img/card/{{ method.card_type }}.svg" class="w-[50px]"/>
+                                <span>{{ method.bank_name }}</span>
+                            </div>
+                            <div class="flex items-cente space-x-8">
+                                <span>{{ method.card_number }}</span>
+                                <a href="/pengaturan?detail={{ method.id }}" class="underline">Detail</a>
+                            </div>
+                        </div>
+                        {# Tampilkan detail hanya jika ID cocok #}
+                        {% if detail and method.id == detail.id %}
+                            <div class="flex items-center justify-between mb-8">
+                                <h1 class="font-bold text-xl">Detail Kartu</h1>
+                                <a href="/pengaturan" class="text-sm hover:underline">Tutup</a>
+                            </div>
+                            <div class="w-[350px] h-[200px] bg-[url('/static/img/card/bg/card-{{ detail.card_type }}.png')] rounded-lg overflow-hidden relative select-none text-white">
+                                <span class="absolute font-mono bottom-[80px] left-[18px]">{{ detail.card_number }}</span>
+                                <div class="absolute bottom-[45px] left-[18px] text-[9px]">
+                                    <span class="block">Valid till</span>
+                                    <span class="font-bold">{{ detail.expired_month }}/{{ detail.expired_year }}</span>
+                                </div>
+                                <span class="absolute bottom-[20px] left-[18px] text-xs uppercase font-bold font-mono">{{ detail.placeholder_name }}</span>
+                            </div>
 
-        <!-- Default Role -->
-        <div>
-            <label class="block font-semibold mb-1">Default Role Pengguna Baru</label>
-            <p class="border px-3 py-2 rounded bg-gray-50 capitalize">{{ pengaturan.default_role }}</p>
+                            <button class="w-full focus:outline-none text-red-700 bg-white hover:text-white hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 mt-8" id="delete-card">
+                                Hapus Kartu
+                            </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
         </div>
     </div>
-
-    <div class="mt-6">
-        <a href="{{ url_for('index') }}" class="text-blue-600 hover:underline text-sm">
-            &larr; Kembali ke Dashboard
-        </a>
-    </div>
-</div>
 {% endblock %}

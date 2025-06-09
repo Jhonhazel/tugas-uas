@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, DateTime, Integer, ForeignKey
-from db.base import Base
+from db.db import Base
 from sqlalchemy.orm import relationship
 
 class LoginHistory(Base):

@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, DateTime, func
 from sqlalchemy.orm import relationship
-from db.base import Base
+from db.db import Base
 
 class Vendor(Base):
     __tablename__ = 'vendors'

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Laporan Event | Tiketen</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            padding: 40px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #1e40af;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #bbb;
+            text-align: left;
+        }
+        th {
+            background-color: #f1f5f9;
+        }
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Laporan Event</h1>
+    <h2>{{ event.name }}</h2>
+
+    <p><strong>Tanggal Mulai:</strong> {{ event.started_at.strftime('%d %B %Y') }}<br>
+       <strong>Tanggal Selesai:</strong> {{ event.ended_at.strftime('%d %B %Y') }}<br>
+       <strong>Lokasi:</strong> {{ event.venue_address }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Jumlah Tiket Terjual</th>
+                <th>Total Pendapatan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ event.tickets_sold }}</td>
+                <td>Rp {{ "{:,.0f}".format(event.total_income).replace(",", ".") }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <footer>
+        <p><strong>Tiketen</strong><br>
+        Jl. Sudirman No. 123, Jakarta<br>
+        info@tiketen.com | +62 812 3456 7890</p>
+    </footer>
+</body>
+</html>

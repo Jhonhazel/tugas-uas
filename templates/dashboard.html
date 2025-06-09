@@ -163,6 +163,7 @@
         }
 
     </style>
+    {{ moment.include_moment() }}
 </head>
 <body class="bg-custom-white text-gray-100 flex flex-col min-h-screen">
 
@@ -267,7 +268,7 @@
         
 
         <footer class="mt-auto text-center text-sm text-gray-400 py-4">
-            <p>&copy; <span id="currentYear"></span> Nama Perusahaan Anda. Semua Hak Dilindungi.</p>
+            <p class="text-gray-400">&copy; 2024 Tiketen. All rights reserved.</p>
         </footer>
 
     </main>
@@ -334,5 +335,8 @@
 </div>
 
 <script src="{{ url_for('static', filename='dashboard.js') }}" defer></script>
+<script src="{{ url_for('static', filename='script/create_event.js') }}" defer></script>
+<script src="{{ url_for('static', filename='script/my_event.js') }}" defer></script>
+<script src="{{ url_for('static', filename='script/pengaturan.js') }}" defer></script>
 </body>
 </html>

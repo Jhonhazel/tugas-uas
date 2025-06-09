@@ -2,12 +2,11 @@ import enum
 
 from sqlalchemy import Column, Integer, String, DateTime, Enum
 from datetime import datetime
-from db.base import Base
+from db.db import Base
 
 class RoleUser(enum.Enum):
     admin = 'admin'
     user = 'user'
-    organizer = 'organizer'
 
 class User(Base):
     __tablename__ = 'users'

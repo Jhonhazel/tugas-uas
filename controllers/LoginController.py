@@ -4,6 +4,7 @@ from flask import request, jsonify, redirect, url_for
 from flask_login import login_user, current_user, logout_user
 from controllers.Controllers import Controller
 from lib.comparePass import comparePass
+from lib.model_to_dicts import model_to_dict
 from lib.string_func import generate_random_string
 from models.Users import User
 from models.LoginHistory import LoginHistory
@@ -34,13 +35,12 @@ class LoginController(Controller):
         self._db.commit()
 
         login_user(user)
+        data = model_to_dict(user)
 
-        return jsonify({"message": "Login successful"}), 200
+        return jsonify({"message": "Login successful", "data": data }), 200
 
     def Logout(self):
-
         try:
-
             self._db.query(LoginHistory).filter_by(user_id=current_user.id, logout_date=None).update(
                 {"logout_date": datetime.now()})
             self._db.commit()
